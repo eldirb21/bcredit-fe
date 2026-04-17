@@ -1,35 +1,56 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import Icons from "@expo/vector-icons/Feather";
+import { Tabs } from "expo-router";
+import React from "react";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const tabs = [
+    {
+      path: "index",
+      title: "Home",
+      icon: (color: string) => <Icons size={24} name="home" color={color} />,
+    },
+    {
+      path: "customer",
+      title: "Konsumen",
+      icon: (color: string) => <Icons size={24} name="users" color={color} />,
+    },
+    {
+      path: "history",
+      title: "Riwayat",
+      icon: (color: string) => (
+        <Icons size={24} name="activity" color={color} />
+      ),
+    },
+    {
+      path: "settings",
+      title: "Settings",
+      icon: (color: string) => (
+        <Icons size={24} name="settings" color={color} />
+      ),
+    },
+  ];
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+      }}
+    >
+      {tabs.map((x, i) => (
+        <Tabs.Screen
+          key={i}
+          name={x.path}
+          options={{
+            title: x.title,
+            tabBarIcon: ({ color }) => x.icon(color),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
