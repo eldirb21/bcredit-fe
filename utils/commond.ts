@@ -19,6 +19,12 @@ const formatDate = (date: string) => {
     })
   );
 };
+const getCurrentMonthYear = () => {
+  return new Date().toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
+};
 
 const PAYMENT_METHODS = [
   { label: "Cash", value: "cash" },
@@ -29,5 +35,4 @@ const PAYMENT_METHODS = [
   { label: "OVO", value: "ovo" },
 ];
 
-export { formatDate, formatRupiah, PAYMENT_METHODS };
-
+export { formatDate, formatRupiah, getCurrentMonthYear, PAYMENT_METHODS };
