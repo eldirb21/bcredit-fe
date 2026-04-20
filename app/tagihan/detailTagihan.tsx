@@ -14,19 +14,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type TagihanParams = {
   nama?: string;
-  noPelanggan?: string;
+  noPinjaman?: string;
 };
 
 export default function DetailTagihan() {
   const params = useLocalSearchParams<TagihanParams>();
 
   const angsuran = [
-    { status: "Lunas", nominal: 2250000 },
-    { status: "Terlambat", nominal: 2250000 },
-    { status: "Terjadwal", nominal: 2250000 },
-    { status: "Lunas", nominal: 2250000 },
-    { status: "Terlambat", nominal: 2250000 },
-    { status: "Terjadwal", nominal: 2250000 },
+    { angsuran: 1, status: "Lunas", nominal: 200000 },
+    { angsuran: 2, status: "Terlambat", nominal: 200000 },
+    { angsuran: 3, status: "Terjadwal", nominal: 200000 },
+    { angsuran: 4, status: "Terjadwal", nominal: 200000 },
+    { angsuran: 5, status: "Terjadwal", nominal: 200000 },
+    { angsuran: 6, status: "Terjadwal", nominal: 200000 },
   ];
 
   const getStatus = (status: string) => {
@@ -51,7 +51,11 @@ export default function DetailTagihan() {
     };
   };
 
-  const handlerPayment = (item: { nominal: string; status: "String" }) => {
+  const handlerPayment = (item: {
+    nominal: number;
+    status: string;
+    angsuran: number;
+  }) => {
     router.push("/tagihan/payment");
     console.log(item);
   };
@@ -92,21 +96,24 @@ export default function DetailTagihan() {
               {params.nama || "-"}
             </Text>
             <Text style={{ color: "#9CA3AF", fontSize: 13 }}>
-              No. Kontrak: {params.noPelanggan || "-"}
+              No. Angota: {params.anggota || "200426001"}
+            </Text>
+            <Text style={{ color: "#9CA3AF", fontSize: 13 }}>
+              No. Pinjaman: {params.noPinjaman || "-"}
             </Text>
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-            <InfoCard label="Pokok Pinjaman" value={formatRupiah(30000000)} />
+            <InfoCard label="Pokok Pinjaman" value={formatRupiah(1000000)} />
             <InfoCard
-              label="Angsuran/bulan"
-              value={formatRupiah(2250000)}
+              label="Angsuran/minggu"
+              value={formatRupiah(200000)}
               color="#60A5FA"
             />
-            <InfoCard label="Tenor" value="24 bulan" />
+            <InfoCard label="Ansuran" value="6 minggu" />
             <InfoCard
               label="Sisa Tagihan"
-              value={formatRupiah(27000000)}
+              value={formatRupiah(1000000)}
               color="#EF4444"
             />
           </View>
@@ -128,6 +135,7 @@ export default function DetailTagihan() {
                 return (
                   <TouchableOpacity
                     activeOpacity={0.8}
+                    disabled={item.status === "Lunas"}
                     onPress={() => handlerPayment(item)}
                     key={index}
                     style={[
@@ -179,23 +187,18 @@ export default function DetailTagihan() {
               })}
             </View>
           </View>
-
-          {/* TANDA TERIMA */}
-          <View style={receiptContainer}>
-            <Text style={sectionTitle}>TANDA TERIMA PEMBAYARAN</Text>
-
-            <View style={{ marginTop: 6, gap: 6 }}>
-              <Row label="Jumlah diterima" value={formatRupiah(2250000)} />
-              <Row label="Diterima oleh" value="Ahmad (Kolektor)" />
-            </View>
-          </View>
         </ScrollView>
       </View>
 
       {/* ACTION BUTTON */}
       <View style={{ flexDirection: "row", margin: 8, gap: 8 }}>
-        <ActionButton icon="share" label="Bagikan" />
-        <ActionButton icon="printer" label="Print" dark />
+        <ActionButton icon="share" label="Bayar Cepat" />
+        {/* <ActionButton
+          icon="printer"
+          label="Print"
+          dark
+          onPress={() => router.push("/tagihan/ThermalReceipt")}
+        /> */}
       </View>
     </SafeAreaView>
   );

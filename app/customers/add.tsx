@@ -1,42 +1,94 @@
+import { SelectInput } from "@/components/atoms";
+import { ANGSUR_TYPE, TENOR_TYPE } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AddCustomerScreen() {
   const [form, setForm] = useState({
     nama: "",
+    pekerjaan: "",
+    tempatUsaha: "",
+    jenisUsaha: "",
     phone: "",
     alamat: "",
-    noKontrak: "",
-    nominal: "",
-    cicilan: "",
-    jatuhTempo: "",
+    noAnggota: "",
+
+    noPinjaman: generateNoPinjaman(),
+
+    pinjamanPokok: "",
+    tipeAngsuran: "harian",
+    tenor: "25",
+    angsuranNominal: "",
   });
+
+  const [errors, setErrors] = useState<any>({});
+
+  /* ================= HELPERS ================= */
+
+  function generateNoPinjaman() {
+    return "PJM-" + Date.now().toString().slice(-6);
+  }
+
+  const formatRupiah = (num: number) =>
+    new Intl.NumberFormat("id-ID").format(num);
 
   const setField = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev: any) => ({ ...prev, [key]: "" }));
   };
 
-  const handleSubmit = () => {
-    console.log("DATA CUSTOMER:", form);
+  /* ================= CALCULATION ================= */
 
-    // next:
-    // simpan ke DB / API
+  useEffect(() => {
+    calculateAngsuran();
+  }, [form.tenor, form.tipeAngsuran, form.pinjamanPokok]);
+
+  const calculateAngsuran = () => {
+    const pokok = Number(form.pinjamanPokok);
+    const tenor = Number(form.tenor);
+
+    if (!pokok || !tenor) {
+      setForm((prev) => ({ ...prev, angsuranNominal: "" }));
+      return;
+    }
+
+    const bunga = form.tipeAngsuran === "harian" ? 25 : 20;
+
+    const bungaNominal = (pokok * bunga) / 100;
+    const total = pokok + bungaNominal;
+    const angsuran = total / tenor;
+
+    setForm((prev) => ({
+      ...prev,
+      angsuranNominal: formatRupiah(Math.round(angsuran)),
+    }));
+  };
+
+  /* ================= SUBMIT ================= */
+
+  const handleSubmit = () => {
+    console.log("DATA:", form);
+
+    // TODO: kirim ke API / DB
 
     router.back();
   };
+
+  /* ================= UI ================= */
+  console.log(form.angsuranNominal);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -52,16 +104,36 @@ export default function AddCustomerScreen() {
             <TouchableOpacity onPress={() => router.back()}>
               <Icons name="arrow-left" size={20} />
             </TouchableOpacity>
-            <Text style={styles.title}>Tambah Konsumen</Text>
+            <Text style={styles.title}>Tambah Nasabah</Text>
             <View style={{ width: 20 }} />
           </View>
 
-          {/* FORM */}
-          <Section title="Data Konsumen">
+          {/* DATA NASABAH */}
+          <Section title="Data Nasabah">
             <Input
               label="Nama"
               value={form.nama}
               onChange={(v) => setField("nama", v)}
+            />
+            <Input
+              label="Pekerjaan"
+              value={form.pekerjaan}
+              onChange={(v) => setField("pekerjaan", v)}
+            />
+            <Input
+              label="Tempat Usaha"
+              value={form.tempatUsaha}
+              onChange={(v) => setField("tempatUsaha", v)}
+            />
+            <Input
+              label="Jenis Usaha"
+              value={form.jenisUsaha}
+              onChange={(v) => setField("jenisUsaha", v)}
+            />
+            <Input
+              label="No Anggota"
+              value={form.noAnggota}
+              onChange={(v) => setField("noAnggota", v)}
             />
             <Input
               label="No HP"
@@ -77,34 +149,65 @@ export default function AddCustomerScreen() {
             />
           </Section>
 
+          {/* DATA PINJAMAN */}
           <Section title="Data Pembiayaan">
             <Input
-              label="No Kontrak"
-              value={form.noKontrak}
-              onChange={(v) => setField("noKontrak", v)}
+              label="No Pinjaman"
+              value={form.noPinjaman}
+              onChange={() => {}}
+              editable={false}
             />
+
             <Input
-              label="Nominal Pinjaman"
-              value={form.nominal}
-              onChange={(v) => setField("nominal", v)}
+              label="Pinjaman Pokok"
+              value={form.pinjamanPokok}
+              onChange={(v) => setField("pinjamanPokok", v)}
               keyboard="numeric"
             />
+
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              <SelectInput
+                label="Tipe Angsuran"
+                value={form.tipeAngsuran}
+                options={TENOR_TYPE}
+                onSelect={(val) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    tipeAngsuran: val,
+                    tenor: val === "harian" ? "25" : "",
+                    angsuranNominal: "",
+                  }));
+                }}
+              />
+
+              {form.tipeAngsuran === "harian" ? (
+                <Input
+                  label="Total Angsuran"
+                  value={form.tenor}
+                  onChange={(v) => setField("tenor", v)}
+                  keyboard="numeric"
+                />
+              ) : (
+                <SelectInput
+                  label="Total Minggu"
+                  value={form.tenor}
+                  options={ANGSUR_TYPE}
+                  onSelect={(val) => setField("tenor", val)}
+                />
+              )}
+            </View>
+
             <Input
-              label="Cicilan / Bulan"
-              value={form.cicilan}
-              onChange={(v) => setField("cicilan", v)}
-              keyboard="numeric"
-            />
-            <Input
-              label="Jatuh Tempo (YYYY-MM-DD)"
-              value={form.jatuhTempo}
-              onChange={(v) => setField("jatuhTempo", v)}
+              label={`Angsuran ${form.tipeAngsuran}`}
+              value={String(form.angsuranNominal)}
+              onChange={() => {}}
+              editable={false}
             />
           </Section>
 
           {/* BUTTON */}
           <TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
-            <Text style={styles.submitText}>Simpan Konsumen</Text>
+            <Text style={styles.submitText}>Simpan Nasabah</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -127,22 +230,22 @@ const Input = ({
   onChange,
   keyboard,
   multiline,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  keyboard?: any;
-  multiline?: boolean;
-}) => (
+  editable = true,
+}: any) => (
   <View>
-    <Text style={styles.label}>{label}</Text>
+    {label && <Text style={styles.label}>{label}</Text>}
     <TextInput
       value={value}
       onChangeText={onChange}
       keyboardType={keyboard}
       multiline={multiline}
-      style={[styles.input, multiline && { height: 80 }]}
-      placeholder={`Masukkan ${label}`}
+      editable={editable}
+      style={[
+        styles.input,
+        multiline && { height: 80 },
+        !editable && { backgroundColor: "#F3F4F6" },
+      ]}
+      placeholder={`Masukkan ${label || ""}`}
     />
   </View>
 );

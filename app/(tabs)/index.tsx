@@ -12,7 +12,7 @@ type SessionKey = "late" | "upcoming";
 type Item = {
   nama: string;
   jatuhTempo: string;
-  noPelanggan: string;
+  noPinjaman: string;
   cicilanKe: string;
   status?: "Terlambat" | "Lunas";
 };
@@ -21,14 +21,14 @@ const DATA: Item[] = [
   {
     nama: "Jojo",
     jatuhTempo: "2026-03-15",
-    noPelanggan: "KTA-2024-00871",
+    noPinjaman: "001",
     cicilanKe: "12",
     status: "Terlambat",
   },
   {
     nama: "Budi",
     jatuhTempo: "2026-04-20",
-    noPelanggan: "KTA-2024-00872",
+    noPinjaman: "002",
     cicilanKe: "5",
   },
 ];
@@ -89,7 +89,7 @@ export default function HomeScreen() {
           >
             {lateData.map((item, i) => (
               <Bill
-                key={`${item.noPelanggan}-${i}`}
+                key={`${item.noPinjaman}-${i}`}
                 item={item}
                 type="late"
                 formatDate={formatDate}
@@ -105,7 +105,7 @@ export default function HomeScreen() {
           >
             {upcomingData.map((item, i) => (
               <Bill
-                key={`${item.noPelanggan}-${i}`}
+                key={`${item.noPinjaman}-${i}`}
                 item={item}
                 type="upcoming"
                 formatDate={formatDate}

@@ -2,12 +2,12 @@ import Icons from "@expo/vector-icons/Feather";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -48,7 +48,7 @@ export default function CustomerDetail() {
             <Icons name="arrow-left" size={20} />
           </TouchableOpacity>
 
-          <Text style={styles.title}>Detail Konsumen</Text>
+          <Text style={styles.title}>Detail Nasabah</Text>
 
           <TouchableOpacity
             onPress={() =>
@@ -79,10 +79,13 @@ export default function CustomerDetail() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Informasi Kontrak</Text>
 
-          <Info label="No Kontrak" value={data.noKontrak} />
-          <Info label="Nominal" value={formatRupiah(data.nominal)} />
-          <Info label="Cicilan / Bulan" value={formatRupiah(data.cicilan)} />
-          <Info label="Jatuh Tempo" value={formatDate(data.jatuhTempo)} />
+          <Info label="No Anggota" value={data.noKontrak} />
+          <Info label="No Pinjaman" value={formatRupiah(data.nominal)} />
+          <Info label="Pinjaman Pokok" value={formatRupiah(data.nominal)} />
+          <Info label="Jenis Angsuran" value={"Mingguan"} />
+          <Info label="Tenor Angsuran" value={"6"} />
+          <Info label="Angsuran" value={formatRupiah(data.cicilan)} />
+          {/* <Info label="Jatuh Tempo" value={formatDate(data.jatuhTempo)} /> */}
         </View>
 
         {/* SUMMARY */}

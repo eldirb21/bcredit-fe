@@ -17,12 +17,12 @@ type Customer = {
   id: string;
   nama: string;
   phone: string;
-  noKontrak: string;
+  anggota: string;
 };
 
 const DUMMY: Customer[] = [
-  { id: "1", nama: "Jojo", phone: "0812", noKontrak: "KTA-001" },
-  { id: "2", nama: "Budi", phone: "0822", noKontrak: "KTA-002" },
+  { id: "1", nama: "Jojo", phone: "081222223333", anggota: "RES1-001" },
+  { id: "2", nama: "Budi", phone: "082233335555", anggota: "RES1-002" },
 ];
 
 export default function CustomerList() {
@@ -33,12 +33,12 @@ export default function CustomerList() {
     return data.filter(
       (x) =>
         x.nama.toLowerCase().includes(search.toLowerCase()) ||
-        x.noKontrak.toLowerCase().includes(search.toLowerCase()),
+        x.anggota.toLowerCase().includes(search.toLowerCase()),
     );
   }, [search, data]);
 
   const handleDelete = (id: string) => {
-    Alert.alert("Hapus Konsumen", "Yakin mau hapus?", [
+    Alert.alert("Hapus Nasahab", "Yakin mau hapus?", [
       { text: "Batal" },
       {
         text: "Hapus",
@@ -56,7 +56,7 @@ export default function CustomerList() {
 
       {/* HEADER */}
       <View style={styles.header}>
-        <Text style={styles.title}>Data Konsumen</Text>
+        <Text style={styles.title}>Data Nasabah</Text>
 
         <TouchableOpacity
           onPress={() => router.push("/customers/add")}
@@ -70,7 +70,7 @@ export default function CustomerList() {
       <View style={styles.searchBox}>
         <Icons name="search" size={16} color="#9CA3AF" />
         <TextInput
-          placeholder="Cari nama / kontrak"
+          placeholder="Cari nama / nomor pinjaman"
           value={search}
           onChangeText={setSearch}
           style={{ flex: 1 }}
@@ -128,7 +128,7 @@ const CustomerItem = ({
       <View style={{ flex: 1 }}>
         <Text style={styles.name}>{item.nama}</Text>
         <Text style={styles.sub}>
-          {item.noKontrak} • {item.phone}
+          {item.anggota} • {item.phone}
         </Text>
       </View>
 
@@ -152,7 +152,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 16,
+    padding: 12,
+    paddingHorizontal: 16,
     alignItems: "center",
   },
 

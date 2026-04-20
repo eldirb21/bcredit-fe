@@ -34,5 +34,21 @@ const PAYMENT_METHODS = [
   { label: "DANA", value: "dana" },
   { label: "OVO", value: "ovo" },
 ];
+const TENOR_TYPE = [
+  { label: "Harian", value: "harian" },
+  { label: "Mingguan", value: "mingguan" },
+];
+const ANGSUR_TYPE = [
+  { label: "6 minggu", value: "6" },
+  { label: "8 minggu", value: "8" },
+  { label: "10 minggu", value: "10" },
+];
+export {
+  ANGSUR_TYPE,
+  formatDate,
+  formatRupiah,
+  getCurrentMonthYear,
+  PAYMENT_METHODS,
+  TENOR_TYPE
+};
 
-export { formatDate, formatRupiah, getCurrentMonthYear, PAYMENT_METHODS };

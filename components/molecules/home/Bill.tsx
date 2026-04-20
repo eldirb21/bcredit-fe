@@ -11,7 +11,7 @@ type Props = {
 type Item = {
   nama: string;
   jatuhTempo: string;
-  noPelanggan: string;
+  noPinjaman: string;
   cicilanKe: string;
   status?: "Terlambat" | "Lunas";
 };
@@ -40,10 +40,10 @@ export const Bill = ({ item, type, formatDate }: Props) => {
       {/* INFO */}
       <View style={{ flex: 1 }}>
         <Texts color="#111827" weight="semiBold">
-          {item.noPelanggan}
+          {item.noPinjaman}
         </Texts>
         <Texts color="#6B7280">
-          {item.nama} • Cicilan {item.cicilanKe}
+          {item.nama} • Angsuran ke - {item.cicilanKe}
         </Texts>
       </View>
 

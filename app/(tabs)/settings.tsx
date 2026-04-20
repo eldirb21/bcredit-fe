@@ -1,4 +1,5 @@
-import Icons from "@expo/vector-icons/Feather";
+import { Icons } from "@/components/atoms";
+import { ActionButton } from "@/components/molecules";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -30,7 +31,7 @@ export default function SettingScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView style={styles.safe}>
+      <ScrollView style={styles.safe} contentContainerStyle={{ flexGrow: 1 }}>
         <StatusBar barStyle="dark-content" backgroundColor="#F5F6FA" />
 
         {/* HEADER */}
@@ -53,26 +54,26 @@ export default function SettingScreen() {
             style={styles.editBtn}
             onPress={() => setShowEdit(true)}
           >
-            <Icons name="edit-2" size={14} color="#FFF" />
+            <Icons type="Feather" name="edit-2" size={14} color="#FFF" />
             <Text style={styles.editText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
 
         {/* STATS */}
-        <View style={styles.statsWrap}>
+        {/* <View style={styles.statsWrap}>
           <StatBox label="Customer Aktif" value={stats.customer.toString()} />
           <StatBox label="Berhasil" value={stats.success.toString()} success />
           <StatBox label="Target" value={`${stats.target}%`} info />
-        </View>
+        </View> */}
 
         {/* MENU */}
         <View style={styles.menuCard}>
           <MenuItem
             icon="users"
-            label="Data Konsumen"
+            label="Data Nasabah"
             onPress={() => router.replace("/(tabs)/customer")}
           />
-          <MenuItem
+          {/* <MenuItem
             icon="credit-card"
             label="Riwayat Pembayaran"
             onPress={() => router.replace("/(tabs)/history")}
@@ -86,18 +87,23 @@ export default function SettingScreen() {
             icon="settings"
             label="Pengaturan"
             onPress={() => router.push("/settings/pengaturan")}
-          />
+          /> */}
+          <View
+            style={{
+              height: 55,
+              padding: 8,
+            }}
+          >
+            <ActionButton
+              dark
+              label="Logout"
+              icon={"log-out"}
+              onPress={() => {}}
+            />
+          </View>
         </View>
 
         {/* ACTION */}
-        <View style={styles.menuCard}>
-          <MenuItem
-            icon="log-out"
-            label="Logout"
-            danger
-            onPress={() => router.replace("/")}
-          />
-        </View>
 
         {/* MODAL EDIT */}
         <EditProfileModal
@@ -179,12 +185,17 @@ const StatBox = ({ label, value, success, info }: any) => {
 const MenuItem = ({ icon, label, danger, onPress }: any) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
     <View style={styles.menuLeft}>
-      <Icons name={icon} size={18} color={danger ? "#DC2626" : "#374151"} />
+      <Icons
+        type="Feather"
+        name={icon}
+        size={18}
+        color={danger ? "#DC2626" : "#374151"}
+      />
       <Text style={[styles.menuText, danger && { color: "#DC2626" }]}>
         {label}
       </Text>
     </View>
-    <Icons name="chevron-right" size={18} color="#9CA3AF" />
+    <Icons type="Feather" name="chevron-right" size={18} color="#9CA3AF" />
   </TouchableOpacity>
 );
 
@@ -266,6 +277,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 12,
     borderRadius: 12,
+    flex: 1,
+    justifyContent: "space-between",
   },
 
   menuItem: {

@@ -12,6 +12,7 @@ type Props = {
   value: string;
   options: Option[];
   onSelect: (val: string) => void;
+  placeholder?: string;
   error?: string;
 };
 
@@ -20,6 +21,7 @@ export const SelectInput = ({
   value,
   options,
   onSelect,
+  placeholder = "Pilih metode",
   error,
 }: Props) => {
   const [open, setOpen] = useState(false);
@@ -47,7 +49,7 @@ export const SelectInput = ({
         }}
       >
         <Text style={{ color: selected ? "#FFF" : "#9CA3AF" }}>
-          {selected ? selected.label : "Pilih metode"}
+          {selected ? selected.label : placeholder}
         </Text>
         <Icons name={open ? "chevron-up" : "chevron-down"} color="#FFF" />
       </TouchableOpacity>

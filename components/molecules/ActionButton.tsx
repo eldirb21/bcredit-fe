@@ -1,6 +1,6 @@
-import Icons from "@expo/vector-icons/Feather";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
+import { Icons } from "../atoms";
 
 type Props = {
   icon: any;
@@ -41,7 +41,7 @@ export const ActionButton = ({
         opacity: disabled ? 0.7 : 1,
       }}
     >
-      <Icons name={icon} size={18} color={textColor} />
+      <Icons type="Feather" name={icon} size={18} color={textColor} />
       <Text
         style={{
           color: textColor,

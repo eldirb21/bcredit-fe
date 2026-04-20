@@ -5,14 +5,14 @@ import Icons from "@expo/vector-icons/Feather";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -54,7 +54,7 @@ const Payment = () => {
 
   // ✅ SUBMIT
   const handleSubmit = async () => {
-    if (!validate()) return;
+    // if (!validate()) return;
 
     try {
       setLoading(true);
@@ -110,16 +110,14 @@ const Payment = () => {
 
           <View>
             <Text style={styles.name}>{params.nama || "Budi Santoso"}</Text>
-            <Text style={styles.sub}>
-              {params.noPelanggan || "KTA-2024-00871"}
-            </Text>
+            <Text style={styles.sub}>{params.noPelanggan || "001"}</Text>
           </View>
         </View>
 
         {/* INFO */}
         <View style={styles.info}>
           <Row label="Angsuran ke-" value="12" />
-          <Row label="Tagihan" value={formatRupiah(2250000)} />
+          <Row label="Tagihan" value={formatRupiah(200000)} />
           <Row label="Jatuh tempo" value="1 April 2026 (terlambat)" danger />
         </View>
 

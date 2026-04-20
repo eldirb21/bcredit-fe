@@ -4,11 +4,12 @@ import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import React from "react";
 import {
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -39,15 +40,15 @@ const PaymentSuccess = () => {
         {/* RECEIPT */}
         <View style={styles.card}>
           <View style={styles.dashedBox}>
-            <Row label="No. Kontrak" value="KTA-2024-00871" />
-            <Row label="Nama Debitur" value="Agus Santoso" />
+            <Row label="No. Pinjaman" value="001" />
+            <Row label="Nama" value="Agus Santoso" />
             <Row label="Angsuran ke-" value="12" />
             <Row label="Tanggal" value="12 April 2026" />
             <Row label="Metode" value="Cash" />
-            <Row label="Kolektor" value="Ahmad" />
+            {/* <Row label="Kolektor" value="Ahmad" /> */}
           </View>
 
-          <Text style={styles.amount}>{formatRupiah(2250000)}</Text>
+          <Text style={styles.amount}>{formatRupiah(200000)}</Text>
 
           <Text style={styles.note}>
             Terima kasih atas pembayaran Anda. Simpan struk ini sebagai bukti.
@@ -59,8 +60,13 @@ const PaymentSuccess = () => {
       <View style={{ flexDirection: "row", margin: 8, gap: 8 }}>
         <ActionButton
           icon="share"
-          label="Bagikan"
-          onPress={() => console.log("share")}
+          label="Belum Lunas"
+          onPress={() =>
+            Alert.alert(
+              "Info",
+              "Pembayaran Belum lunas ini akan tersimpan sementara",
+            )
+          }
         />
         <ActionButton
           icon="printer"
