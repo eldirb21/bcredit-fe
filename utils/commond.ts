@@ -43,12 +43,16 @@ const ANGSUR_TYPE = [
   { label: "8 minggu", value: "8" },
   { label: "10 minggu", value: "10" },
 ];
+
+const parseRupiah = (value: string): number =>
+  Number(value.replace(/[^0-9]/g, ""));
+
+const formatDiscount = (pct: number): string => (pct > 0 ? `-${pct}%` : "-");
+
 export {
   ANGSUR_TYPE,
-  formatDate,
-  formatRupiah,
-  getCurrentMonthYear,
-  PAYMENT_METHODS,
+  formatDate, formatDiscount, formatRupiah,
+  getCurrentMonthYear, parseRupiah, PAYMENT_METHODS,
   TENOR_TYPE
 };
 
