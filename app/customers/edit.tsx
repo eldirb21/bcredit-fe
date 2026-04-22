@@ -1,5 +1,5 @@
 import { SelectInput } from "@/components/atoms";
-import { ANGSUR_TYPE, TENOR_TYPE } from "@/utils";
+import { ANGSUR_TYPE, axiosInstance, TENOR_TYPE } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -24,7 +24,8 @@ export default function EditCustomerScreen() {
     jenisUsaha: "",
     phone: "",
     alamat: "",
-    noAnggota: "",
+    anggota: "",
+    resort: "",
 
     noPinjaman: generateNoPinjaman(),
 
@@ -75,9 +76,15 @@ export default function EditCustomerScreen() {
 
   /* ================= SUBMIT ================= */
 
-  const handleSubmit = () => {
-    console.log("DATA:", form);
-
+  const handleSubmit = async () => {
+    try {
+      const result = await axiosInstance.put("api/nasabah", form);
+      console.log("DATA:", result.data?.success);
+      console.log("DATA:", result.data?.message);
+      router.replace("/(tabs)/customer");
+    } catch (error) {
+      console.log("DATA error:", error);
+    }
     // TODO: kirim ke API / DB
 
     router.back();

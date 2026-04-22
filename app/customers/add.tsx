@@ -1,5 +1,5 @@
 import { SelectInput } from "@/components/atoms";
-import { ANGSUR_TYPE, TENOR_TYPE } from "@/utils";
+import { ANGSUR_TYPE, axiosInstance, TENOR_TYPE } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -24,7 +24,8 @@ export default function AddCustomerScreen() {
     jenisUsaha: "",
     phone: "",
     alamat: "",
-    noAnggota: "",
+    anggota: "",
+    resort: "",
 
     noPinjaman: generateNoPinjaman(),
 
@@ -79,16 +80,16 @@ export default function AddCustomerScreen() {
 
   /* ================= SUBMIT ================= */
 
-  const handleSubmit = () => {
-    console.log("DATA:", form);
-
-    // TODO: kirim ke API / DB
-
-    router.back();
+  const handleSubmit = async () => {
+    try {
+      const result = await axiosInstance.post("api/nasabah", form);
+      console.log("DATA:", result.data?.success);
+      console.log("DATA:", result.data?.message);
+      router.replace("/(tabs)/customer");
+    } catch (error) {
+      console.log("DATA error:", error);
+    }
   };
-
-  /* ================= UI ================= */
-  console.log(form.angsuranNominal);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -132,8 +133,13 @@ export default function AddCustomerScreen() {
             />
             <Input
               label="No Anggota"
-              value={form.noAnggota}
-              onChange={(v) => setField("noAnggota", v)}
+              value={form.anggota}
+              onChange={(v) => setField("anggota", v)}
+            />
+            <Input
+              label="Resort"
+              value={form.resort}
+              onChange={(v) => setField("resort", v)}
             />
             <Input
               label="No HP"

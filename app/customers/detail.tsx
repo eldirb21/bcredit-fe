@@ -1,6 +1,7 @@
+import { axiosInstance } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StatusBar,
@@ -24,18 +25,26 @@ export default function CustomerDetail() {
     jatuhTempo: params.jatuhTempo as string,
   };
 
+  const [Item, setItem] = useState({});
+
   const formatRupiah = (num: number) => {
+    if (!num) return "";
     return "Rp " + num.toLocaleString("id-ID");
   };
 
-  const formatDate = (date: string) => {
-    if (!date) return "-";
-    return new Date(date).toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const result = await axiosInstance.get(`api/nasabah/${params?._id}`);
+      setItem(result.data?.data);
+    } catch (error) {
+      console.log("DATA error:", error);
+    }
   };
+  console.log(Item);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -54,7 +63,7 @@ export default function CustomerDetail() {
             onPress={() =>
               router.push({
                 pathname: "/customers/edit",
-                params,
+                params: { _id: Item?._id },
               })
             }
           >
@@ -66,32 +75,32 @@ export default function CustomerDetail() {
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
             <Text style={{ fontWeight: "700", fontSize: 18 }}>
-              {data.nama?.slice(0, 2).toUpperCase()}
+              {Item.nama?.slice(0, 2)?.toUpperCase()}
             </Text>
           </View>
 
-          <Text style={styles.name}>{data.nama}</Text>
-          <Text style={styles.sub}>{data.phone}</Text>
-          <Text style={styles.sub}>{data.alamat}</Text>
+          <Text style={styles.name}>{Item.nama}</Text>
+          <Text style={styles.sub}>{Item.phone}</Text>
+          <Text style={styles.sub}>{Item.alamat}</Text>
         </View>
 
         {/* INFO KONTRAK */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Informasi Kontrak</Text>
 
-          <Info label="No Anggota" value={data.noKontrak} />
-          <Info label="No Pinjaman" value={formatRupiah(data.nominal)} />
-          <Info label="Pinjaman Pokok" value={formatRupiah(data.nominal)} />
+          <Info label="No Anggota" value={Item.anggota} />
+          <Info label="No Pinjaman" value={formatRupiah(Item.nominal)} />
+          <Info label="Pinjaman Pokok" value={formatRupiah(Item.nominal)} />
           <Info label="Jenis Angsuran" value={"Mingguan"} />
           <Info label="Tenor Angsuran" value={"6"} />
-          <Info label="Angsuran" value={formatRupiah(data.cicilan)} />
-          {/* <Info label="Jatuh Tempo" value={formatDate(data.jatuhTempo)} /> */}
+          <Info label="Angsuran" value={formatRupiah(Item.cicilan)} />
+          {/* <Info label="Jatuh Tempo" value={formatDate(Item.jatuhTempo)} /> */}
         </View>
 
         {/* SUMMARY */}
         <View style={styles.summaryWrap}>
-          <Summary label="Total Pinjaman" value={formatRupiah(data.nominal)} />
-          <Summary label="Sisa" value={formatRupiah(data.nominal)} danger />
+          <Summary label="Total Pinjaman" value={formatRupiah(Item.nominal)} />
+          <Summary label="Sisa" value={formatRupiah(Item.nominal)} danger />
           <Summary label="Status" value="Aktif" success />
         </View>
 
@@ -109,7 +118,7 @@ export default function CustomerDetail() {
               </View>
 
               <Text style={{ fontWeight: "700" }}>
-                {formatRupiah(data.cicilan)}
+                {formatRupiah(Item.cicilan)}
               </Text>
             </View>
           ))}

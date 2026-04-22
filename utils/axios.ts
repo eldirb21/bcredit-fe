@@ -3,8 +3,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 10000,
+  baseURL: "http://10.0.2.2:4000", //process.env.API_URL,
+  // timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,12 +13,12 @@ const axiosInstance = axios.create({
 // Request interceptor - otomatis sisipkan token kalau ada
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    // const token =
+    //   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
 
     return config;
   },
@@ -29,12 +29,12 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired / unauthorized - bisa redirect ke login
-      if (typeof window !== "undefined") {
-        // window.location.href = "/login";
-      }
-    }
+    // if (error.response?.status === 401) {
+    //   // Token expired / unauthorized - bisa redirect ke login
+    //   if (typeof window !== "undefined") {
+    //     // window.location.href = "/login";
+    //   }
+    // }
 
     return Promise.reject(error);
   },

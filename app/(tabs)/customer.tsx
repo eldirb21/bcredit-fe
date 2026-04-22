@@ -1,6 +1,7 @@
+import { axiosInstance } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -14,19 +15,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Customer = {
-  id: string;
+  _id: string;
   nama: string;
   phone: string;
   anggota: string;
 };
 
-const DUMMY: Customer[] = [
-  { id: "1", nama: "Jojo", phone: "081222223333", anggota: "RES1-001" },
-  { id: "2", nama: "Budi", phone: "082233335555", anggota: "RES1-002" },
-];
-
 export default function CustomerList() {
-  const [data, setData] = useState<Customer[]>(DUMMY);
+  const [data, setData] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -38,16 +34,39 @@ export default function CustomerList() {
   }, [search, data]);
 
   const handleDelete = (id: string) => {
-    Alert.alert("Hapus Nasahab", "Yakin mau hapus?", [
+    Alert.alert("Hapus Nasabah", "Yakin mau hapus?", [
       { text: "Batal" },
       {
         text: "Hapus",
         style: "destructive",
-        onPress: () => {
-          setData((prev) => prev.filter((x) => x.id !== id));
-        },
+        onPress: () => handleSubmitDelete(id),
       },
     ]);
+  };
+
+  const handleSubmitDelete = async (id: string) => {
+    try {
+      const result = await axiosInstance.delete(`api/nasabah/${id}`);
+      console.log("DATA:", result.data?.success);
+      console.log("DATA:", result.data?.message);
+      fetchData();
+    } catch (error) {
+      console.log("DATA error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const result = await axiosInstance.get("api/nasabah");
+      setData(result.data.data);
+      router.replace("/(tabs)/customer");
+    } catch (error) {
+      console.log("DATA error:", error);
+    }
   };
 
   return (
@@ -80,10 +99,11 @@ export default function CustomerList() {
       {/* LIST */}
       <FlatList
         data={filtered}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item?._id?.toString()}
         contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <CustomerItem
+            key={String(item?._id + index)}
             onDetail={() =>
               router.push({
                 pathname: "/customers/detail",
@@ -94,10 +114,10 @@ export default function CustomerList() {
             onEdit={() =>
               router.push({
                 pathname: "/customers/edit",
-                params: item,
+                params: { id: item._id },
               })
             }
-            onDelete={() => handleDelete(item.id)}
+            onDelete={() => handleDelete(item._id)}
           />
         )}
       />
