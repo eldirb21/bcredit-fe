@@ -5,22 +5,47 @@ import { TouchableOpacity, View, ViewStyle } from "react-native";
 
 type Props = {
   item: Item;
-  type: "late" | "upcoming";
+  type: "late" | "scheduled" | "paid";
   formatDate: (d: string) => string;
 };
+
 type Item = {
   nama: string;
   jatuhTempo: string;
   noPinjaman: string;
   cicilanKe: string;
-  status?: "Terlambat" | "Lunas";
+  status?: "Terlambat" | "Lunas" | "Terjadwal";
 };
+
+// 🔥 STYLE MAPPING
+const TYPE_STYLE = {
+  late: {
+    avatarBg: "#FEE2E2",
+    avatarText: "#991B1B",
+    dateBg: "#FEE2E2",
+    dateText: "#B91C1C",
+  },
+  scheduled: {
+    avatarBg: "#E0F2FE",
+    avatarText: "#075985",
+    dateBg: "#E0F2FE",
+    dateText: "#0369A1",
+  },
+  paid: {
+    avatarBg: "#DCFCE7",
+    avatarText: "#166534",
+    dateBg: "#DCFCE7",
+    dateText: "#15803D",
+  },
+};
+
 export const Bill = ({ item, type, formatDate }: Props) => {
-  const isLate = type === "late";
+  const style = TYPE_STYLE[type];
 
   return (
     <TouchableOpacity
       style={cardItem}
+      activeOpacity={0.8}
       onPress={() =>
         router.push({
           pathname: "/tagihan/detailTagihan",
@@ -29,10 +54,8 @@ export const Bill = ({ item, type, formatDate }: Props) => {
       }
     >
       {/* AVATAR */}
-      <View
-        style={[avatar, { backgroundColor: isLate ? "#FEE2E2" : "#DBEAFE" }]}
-      >
-        <Texts color={isLate ? "#991B1B" : "#1E3A8A"} weight="bold">
+      <View style={[avatar, { backgroundColor: style.avatarBg }]}>
+        <Texts color={style.avatarText} weight="bold">
           {item.nama.slice(0, 2).toUpperCase()}
         </Texts>
       </View>
@@ -48,12 +71,8 @@ export const Bill = ({ item, type, formatDate }: Props) => {
       </View>
 
       {/* DATE */}
-      <View
-        style={[dateBox, { backgroundColor: isLate ? "#FEE2E2" : "#E0F2FE" }]}
-      >
-        <Texts color={isLate ? "#B91C1C" : "#0369A1"}>
-          {formatDate(item.jatuhTempo)}
-        </Texts>
+      <View style={[dateBox, { backgroundColor: style.dateBg }]}>
+        <Texts color={style.dateText}>{formatDate(item.jatuhTempo)}</Texts>
       </View>
     </TouchableOpacity>
   );

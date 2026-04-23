@@ -1,3 +1,4 @@
+import { Float } from "@/components/atoms";
 import { axiosInstance } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
@@ -120,6 +121,11 @@ export default function CustomerList() {
             onDelete={() => handleDelete(item._id)}
           />
         )}
+      />
+      <Float
+        onFloat={() => router.push("/customers/ajukanPinjaman")}
+        title="Pinjaman Baru"
+        icon="plus"
       />
     </SafeAreaView>
   );

@@ -24,7 +24,6 @@ export default function AddCustomerScreen() {
     jenisUsaha: "",
     phone: "",
     alamat: "",
-    anggota: "",
     resort: "",
 
     noPinjaman: generateNoPinjaman(),
@@ -131,11 +130,7 @@ export default function AddCustomerScreen() {
               value={form.jenisUsaha}
               onChange={(v) => setField("jenisUsaha", v)}
             />
-            <Input
-              label="No Anggota"
-              value={form.anggota}
-              onChange={(v) => setField("anggota", v)}
-            />
+
             <Input
               label="Resort"
               value={form.resort}

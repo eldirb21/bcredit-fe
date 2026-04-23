@@ -5,7 +5,7 @@ const formatRupiah = (num: number) =>
     maximumFractionDigits: 0,
   }).format(num);
 
-const formatDate = (date: string) => {
+const formatDate = (date: string | Date) => {
   const d = new Date(date);
   return (
     d.toLocaleDateString("id-ID", {
@@ -51,8 +51,12 @@ const formatDiscount = (pct: number): string => (pct > 0 ? `-${pct}%` : "-");
 
 export {
   ANGSUR_TYPE,
-  formatDate, formatDiscount, formatRupiah,
-  getCurrentMonthYear, parseRupiah, PAYMENT_METHODS,
+  formatDate,
+  formatDiscount,
+  formatRupiah,
+  getCurrentMonthYear,
+  parseRupiah,
+  PAYMENT_METHODS,
   TENOR_TYPE
 };
 
