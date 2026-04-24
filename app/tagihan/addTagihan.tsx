@@ -1,3 +1,4 @@
+import { Input } from "@/components/atoms";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -7,7 +8,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -72,7 +72,7 @@ export default function AddPaymentScreen() {
             <Input
               label="Nominal"
               value={form.nominal}
-              keyboard="numeric"
+              keyboardType="numeric"
               onChange={(v) => setField("nominal", v)}
             />
 
@@ -111,33 +111,6 @@ export default function AddPaymentScreen() {
     </SafeAreaView>
   );
 }
-
-/* ================= COMPONENT ================= */
-
-const Input = ({
-  label,
-  value,
-  onChange,
-  keyboard,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  keyboard?: any;
-}) => (
-  <View>
-    <Text style={styles.label}>{label}</Text>
-    <TextInput
-      value={value}
-      onChangeText={onChange}
-      keyboardType={keyboard}
-      style={styles.input}
-      placeholder={`Masukkan ${label}`}
-    />
-  </View>
-);
-
-/* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F5F6FA" },

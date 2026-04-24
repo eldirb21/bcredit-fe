@@ -1,4 +1,5 @@
 import { DateTimes, SelectInput } from "@/components/atoms";
+import { Input } from "@/components/atoms/Input";
 import { ActionButton } from "@/components/molecules";
 import { formatRupiah, PAYMENT_METHODS } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
@@ -6,11 +7,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -71,126 +73,128 @@ const Payment = () => {
   };
 
   // ✅ COMPONENT INPUT BIAR RAPI
-  const Input = ({ label, value, onChange, placeholder, error }: any) => (
-    <View style={{ gap: 6 }}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        placeholderTextColor="#b0b0b0"
-        value={value}
-        onChangeText={onChange}
-        placeholder={placeholder}
-        style={[styles.input, error && { borderColor: "red", borderWidth: 1 }]}
-      />
-      {error && <Text style={styles.error}>{error}</Text>}
-    </View>
-  );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F6FA" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#e3e3e3" />
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="dark-content" />
 
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* HEADER */}
-        <View style={styles.titleWrap}>
-          <Text style={styles.title}>CATAT PEMBAYARAN</Text>
-        </View>
-
-        {/* CARD */}
-        <View style={styles.card}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-              <Icons name="arrow-left" color="#FFF" size={18} />
-              <Text style={{ color: "#FFF" }}>Kembali</Text>
-            </TouchableOpacity>
-
-            <Text style={{ color: "#FFF", fontWeight: "600" }}>
-              Catat Pembayaran
-            </Text>
-          </View>
-
-          <View>
-            <Text style={styles.name}>{params.nama || "Budi Santoso"}</Text>
-            <Text style={styles.sub}>{params.noPelanggan || "001"}</Text>
-          </View>
-        </View>
-
-        {/* INFO */}
-        <View style={styles.info}>
-          <Row label="Angsuran ke-" value="12" />
-          <Row label="Tagihan" value={formatRupiah(200000)} />
-          <Row label="Jatuh tempo" value="1 April 2026 (terlambat)" danger />
-        </View>
-
-        {/* FORM */}
-        <Input
-          label="JUMLAH DIBAYAR"
-          value={form.amount}
-          onChange={(v: string) => handleChange("amount", v)}
-          placeholder="Rp"
-          error={errors.amount}
-        />
-
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <View style={{ flex: 1, gap: 6 }}>
-            {/* DATE */}
-            <Text style={styles.label}>{"TANGGAL BAYAR"}</Text>
-            <DateTimes
-              value={form.date || new Date()}
-              type="date"
-              placeholder="Pilih tanggal"
-              onChangeDate={(v: Date) => handleChange("date", v)}
-            />
-          </View>
-          <View style={{ flex: 1, gap: 6 }}>
-            {/* TIME */}
-            <Text style={styles.label}>{"JAM"}</Text>
-            <DateTimes
-              value={form.date || new Date()}
-              type="time"
-              placeholder="Pilih jam"
-              onChangeDate={(v: Date) => handleChange("time", v)}
-            />
-          </View>
-        </View>
-
-        <SelectInput
-          label="METODE PEMBAYARAN"
-          value={form.method}
-          options={PAYMENT_METHODS}
-          onSelect={(val) => handleChange("method", val)}
-          error={errors.method}
-        />
-
-        <Input
-          label="KOLEKTOR"
-          value={form.collector}
-          onChange={(v: string) => handleChange("collector", v)}
-          placeholder="Ahmad"
-          error={errors.collector}
-        />
-
-        <Input
-          label="CATATAN (OPTIONAL)"
-          value={form.note}
-          onChange={(v: string) => handleChange("note", v)}
-          placeholder="Tambahan info..."
-        />
-      </ScrollView>
-
-      <View
-        style={{
-          height: 45,
-          marginHorizontal: 12,
-        }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <ActionButton
-          icon="check"
-          label={loading ? "Menyimpan..." : "Simpan & Cetak Bukti"}
-          dark
-          disabled={loading}
-          onPress={handleSubmit}
-        />
-      </View>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* HEADER */}
+          <View style={styles.titleWrap}>
+            <Text style={styles.title}>CATAT PEMBAYARAN</Text>
+          </View>
+
+          {/* CARD */}
+          <View style={styles.card}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 20 }}
+            >
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.back}
+              >
+                <Icons name="arrow-left" color="#FFF" size={18} />
+                <Text style={{ color: "#FFF" }}>Kembali</Text>
+              </TouchableOpacity>
+
+              <Text style={{ color: "#FFF", fontWeight: "600" }}>
+                Catat Pembayaran
+              </Text>
+            </View>
+
+            <View>
+              <Text style={styles.name}>{params.nama || "Budi Santoso"}</Text>
+              <Text style={styles.sub}>{params.noPelanggan || "001"}</Text>
+            </View>
+          </View>
+
+          {/* INFO */}
+          <View style={styles.info}>
+            <Row label="Angsuran ke-" value="12" />
+            <Row label="Tagihan" value={formatRupiah(200000)} />
+            <Row label="Jatuh tempo" value="1 April 2026 (terlambat)" danger />
+          </View>
+
+          {/* FORM */}
+          <Input
+            label="JUMLAH DIBAYAR"
+            value={form.amount}
+            onChange={(v: string) => handleChange("amount", v)}
+            placeholder="Rp"
+            keyboardType="numeric"
+            error={errors.amount}
+          />
+
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <View style={{ flex: 1, gap: 6 }}>
+              {/* DATE */}
+              <Text style={styles.label}>{"TANGGAL BAYAR"}</Text>
+              <DateTimes
+                value={form.date || new Date()}
+                type="date"
+                placeholder="Pilih tanggal"
+                onChangeDate={(v: Date) => handleChange("date", v)}
+              />
+            </View>
+            <View style={{ flex: 1, gap: 6 }}>
+              {/* TIME */}
+              <Text style={styles.label}>{"JAM"}</Text>
+              <DateTimes
+                value={form.date || new Date()}
+                type="time"
+                placeholder="Pilih jam"
+                onChangeDate={(v: Date) => handleChange("time", v)}
+              />
+            </View>
+          </View>
+
+          <SelectInput
+            label="METODE PEMBAYARAN"
+            value={form.method}
+            options={PAYMENT_METHODS}
+            onSelect={(val) => handleChange("method", val)}
+            error={errors.method}
+          />
+
+          <Input
+            label="KOLEKTOR"
+            value={form.collector}
+            onChange={(v: string) => handleChange("collector", v)}
+            placeholder="Ahmad"
+            error={errors.collector}
+          />
+
+          <Input
+            label="CATATAN (OPTIONAL)"
+            value={form.note}
+            onChange={(v: string) => handleChange("note", v)}
+            placeholder="Tambahan info..."
+          />
+        </ScrollView>
+
+        <View
+          style={{
+            height: 45,
+            marginHorizontal: 12,
+          }}
+        >
+          <ActionButton
+            icon="check"
+            label={loading ? "Menyimpan..." : "Simpan & Cetak Bukti"}
+            dark
+            disabled={loading}
+            onPress={handleSubmit}
+          />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -209,6 +213,8 @@ const Row = ({ label, value, danger }: any) => (
 
 /* 🔥 STYLES */
 const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#F5F6FA" },
+
   container: {
     flex: 1,
     padding: 12,

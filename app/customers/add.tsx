@@ -1,4 +1,4 @@
-import { SelectInput } from "@/components/atoms";
+import { Input, SelectInput } from "@/components/atoms";
 import { ANGSUR_TYPE, axiosInstance, TENOR_TYPE } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
@@ -10,7 +10,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -140,7 +139,7 @@ export default function AddCustomerScreen() {
               label="No HP"
               value={form.phone}
               onChange={(v) => setField("phone", v)}
-              keyboard="phone-pad"
+              keyboardType="phone-pad"
             />
             <Input
               label="Alamat"
@@ -163,7 +162,7 @@ export default function AddCustomerScreen() {
               label="Pinjaman Pokok"
               value={form.pinjamanPokok}
               onChange={(v) => setField("pinjamanPokok", v)}
-              keyboard="numeric"
+              keyboardType="numeric"
             />
 
             <View style={{ flexDirection: "row", gap: 12 }}>
@@ -186,7 +185,7 @@ export default function AddCustomerScreen() {
                   label="Total Angsuran"
                   value={form.tenor}
                   onChange={(v) => setField("tenor", v)}
-                  keyboard="numeric"
+                  keyboardType="numeric"
                 />
               ) : (
                 <SelectInput
@@ -225,34 +224,6 @@ const Section = ({ title, children }: any) => (
   </View>
 );
 
-const Input = ({
-  label,
-  value,
-  onChange,
-  keyboard,
-  multiline,
-  editable = true,
-}: any) => (
-  <View>
-    {label && <Text style={styles.label}>{label}</Text>}
-    <TextInput
-      value={value}
-      onChangeText={onChange}
-      keyboardType={keyboard}
-      multiline={multiline}
-      editable={editable}
-      style={[
-        styles.input,
-        multiline && { height: 80 },
-        !editable && { backgroundColor: "#F3F4F6" },
-      ]}
-      placeholder={`Masukkan ${label || ""}`}
-    />
-  </View>
-);
-
-/* ================= STYLES ================= */
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F5F6FA" },
 
@@ -277,20 +248,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 6,
     color: "#374151",
-  },
-
-  label: {
-    fontSize: 12,
-    marginBottom: 4,
-    color: "#6B7280",
-  },
-
-  input: {
-    backgroundColor: "#FFF",
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
   },
 
   submitBtn: {

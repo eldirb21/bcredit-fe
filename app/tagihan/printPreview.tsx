@@ -1,13 +1,14 @@
-import React from "react";
+import { connectPrinter, initPrinter, printStruk } from "@/utils/printer";
+import React, { useEffect, useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import ThermalPrinterModule from "react-native-thermal-printer";
+import { Dropdown } from "react-native-element-dropdown";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface LoanData {
@@ -233,55 +234,57 @@ const ThermalReceipt: React.FC<{ data: LoanData }> = ({ data }) => {
   );
 };
 
-// ── Screen ───────────────────────────────────────────────────────────────────
-export default function KoperasiPrintScreen() {
-  const generateReceipt = (data: LoanData) => {
-    return (
-      `[C]<b>KOPERASI INDONESIA</b>\n` +
-      `[C]Jl. Mayot Oking Jaya Atmajas\n` +
-      `[C]================================\n` +
-      `[L]Resort : ${data.resort}\n` +
-      `[L]No Pjm : ${data.noPjm}\n` +
-      `[L]No Agt : ${data.noAgt}\n` +
-      `[L]Pjm Ke : ${data.pjmKe}\n` +
-      `[C]--------------------------------\n` +
-      `[L]Nama   : ${data.nama}\n` +
-      `[L]Alamat : ${data.alamat}\n` +
-      `[L]RT/RW  : ${data.rt}/${data.rw}\n` +
-      `[L]Ket    : ${data.ket}\n` +
-      `[L]Tanggal: ${data.tanggal}\n` +
-      `[C]--------------------------------\n` +
-      `[L]Pinjaman : ${rupiah(data.pinjamanPokok)}\n` +
-      `[L]Bunga    : ${rupiah(data.bunga)}\n` +
-      `[L]Total    : ${rupiah(data.jumlah)}\n` +
-      `[C]================================\n` +
-      `[C]<b>ANGSURAN KE-${data.angsuranSekarang}</b>\n` +
-      `[C]<font size='big'>${rupiah(data.menyicil)}</font>\n` +
-      `[C]================================\n` +
-      `[L]Pokok    : ${rupiah(data.pokok)}\n` +
-      `[L]Wajib    : ${rupiah(data.wajib)}\n` +
-      `[L]Sukarela : ${rupiah(data.sukarela)}\n` +
-      `[L]Jumlah   : ${rupiah(data.jumlahMasuk)}\n` +
-      `[C]--------------------------------\n` +
-      `[C]Terima kasih\n` +
-      `[C]Koperasi Indonesia\n\n\n`
-    );
-  };
+export default function PrintPreview() {
+  const [devices, setDevices] = useState<any[]>([]);
+  const [selected, setSelected] = useState<any>(null);
+
   const handlePrint = async () => {
+    if (!selected) {
+      alert("Pilih printer dulu");
+      return;
+    }
     try {
-      console.log("press");
+      await connectPrinter(selected.value);
 
-      const payload = generateReceipt(sampleData);
+      await printStruk({
+        nama: "Jojo",
+        anggotaId: "AG2026-001",
+        noPinjaman: "PJ001",
+        resort: "Jakarta Selatan",
 
-      await ThermalPrinterModule.printTcp({
-        payload,
+        alamat:
+          "Jl. Ki Hajar Dewantara No.19 Blok K, Gading, Kec. Serpong, Tangerang",
+
+        jenisUsaha: "Warung Sembako dan Minuman Ringan",
+        tempatUsaha: "Pasar Serpong",
+
+        tanggalBayar: "24-04-2026",
+
+        pokok: 1000000,
+        angsuran: 200000,
+        cicilanKe: 2,
+
+        status: "aktif",
       });
-
-      console.log("Print sukses");
-    } catch (err: any) {
-      console.log("Error:", err.message);
+    } catch (err) {
+      console.log("TouchableOpacity: ", err);
     }
   };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const load = async () => {
+    const res = await initPrinter();
+
+    setDevices(res ?? []);
+  };
+
+  const printers = devices.map((x) => ({
+    label: x.device_name,
+    value: x.inner_mac_address,
+  }));
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -289,6 +292,18 @@ export default function KoperasiPrintScreen() {
       <Text style={styles.screenSub}>Lebar kertas: 58mm / 80mm</Text>
 
       <ThermalReceipt data={sampleData} />
+
+      <Dropdown
+        data={printers}
+        labelField="label"
+        valueField="value"
+        placeholder="Pilih Printer"
+        selectedTextStyle={{ textTransform: "capitalize" }}
+        value={selected}
+        onChange={(item) => setSelected(item)}
+        style={input}
+        itemTextStyle={{ textTransform: "capitalize" }}
+      />
 
       <TouchableOpacity style={styles.printBtn} onPress={handlePrint}>
         <Text style={styles.printBtnText}>🖨️ Cetak ke Printer Thermal</Text>
@@ -302,6 +317,15 @@ export default function KoperasiPrintScreen() {
 // ── Styles ───────────────────────────────────────────────────────────────────
 const FONT = Platform.OS === "ios" ? "Courier New" : "monospace";
 const W = 280; // lebar struk simulasi
+
+const input = {
+  backgroundColor: "#F3F4F6",
+  padding: 12,
+  borderRadius: 10,
+  marginBottom: 10,
+  textTransform: "capitalize",
+  width: 200,
+};
 
 const styles = StyleSheet.create({
   screen: {

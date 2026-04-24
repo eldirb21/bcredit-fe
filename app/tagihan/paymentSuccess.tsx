@@ -72,7 +72,7 @@ const PaymentSuccess = () => {
           icon="printer"
           label="Print"
           dark
-          onPress={() => console.log("print")}
+          onPress={() => router.push("/tagihan/printPreview")}
         />
       </View>
 
