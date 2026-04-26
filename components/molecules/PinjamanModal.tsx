@@ -3,12 +3,12 @@
 import { axiosInstance } from "@/utils";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-    ViewStyle,
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
@@ -42,7 +42,7 @@ export function PinjamanModal({ onClose, onSuccess }: Props) {
 
   const fetchNasabah = async () => {
     try {
-      const res = await axiosInstance.get("/api/nasabah/dropdown");
+      const res = await axiosInstance.get("nasabah/dropdown");
       setNasabah(res.data.data);
     } catch (err) {
       console.log(err);
@@ -121,7 +121,7 @@ export function PinjamanModal({ onClose, onSuccess }: Props) {
 
       const selectedNasabah = nasabah.find((x) => x.value === selected);
 
-      await axiosInstance.post("/api/pinjaman", {
+      await axiosInstance.post("pinjaman", {
         namaPeminjam: selectedNasabah?.label,
         anggotaId: selected,
         pinjamanPokok: Number(form.pinjamanPokok),

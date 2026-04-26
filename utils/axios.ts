@@ -1,10 +1,11 @@
 "use client";
+import { API_URL } from "@env";
 
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://10.0.2.2:4000", //process.env.API_URL,
-  // timeout: 10000,
+  baseURL: API_URL,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },

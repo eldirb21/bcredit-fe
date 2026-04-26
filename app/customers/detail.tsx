@@ -38,7 +38,7 @@ export default function CustomerDetail() {
 
   const fetchData = async () => {
     try {
-      const result = await axiosInstance.get(`api/nasabah/${params?._id}`);
+      const result = await axiosInstance.get(`nasabah/${params?._id}`);
       setItem(result.data?.data);
     } catch (error) {
       console.log("DATA error:", error);

@@ -35,7 +35,7 @@ export default function SearchTagihan() {
     try {
       setLoading(true);
 
-      const res = await axiosInstance.get("/api/search", {
+      const res = await axiosInstance.get("search", {
         params: {
           q: debounce,
           page: 1,

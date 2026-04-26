@@ -76,7 +76,7 @@ export default function EditCustomerScreen() {
 
   const handleSubmit = async () => {
     try {
-      const result = await axiosInstance.put("api/nasabah", form);
+      const result = await axiosInstance.put("nasabah", form);
       console.log("DATA:", result.data?.success);
       console.log("DATA:", result.data?.message);
       router.replace("/(tabs)/customer");

@@ -2,7 +2,7 @@
 
 import { Float, Texts } from "@/components/atoms";
 import { Bill, Header, Section, Tab } from "@/components/molecules/home";
-import { verticalScale } from "@/utils";
+import { axiosInstance, verticalScale } from "@/utils";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -54,9 +54,15 @@ export default function HomeScreen() {
     loadInitial();
   }, []);
 
-  const loadInitial = () => {
-    const initial = generateDummy(10);
-    setData(initial);
+  const loadInitial = async () => {
+    try {
+      const result = await axiosInstance.get("pinjaman");
+      const initial = generateDummy(10);
+      console.log(result.data);
+      setData(initial);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // 🔄 REFRESH

@@ -80,7 +80,7 @@ export default function AddCustomerScreen() {
 
   const handleSubmit = async () => {
     try {
-      const result = await axiosInstance.post("api/nasabah", form);
+      const result = await axiosInstance.post("nasabah", form);
       console.log("DATA:", result.data?.success);
       console.log("DATA:", result.data?.message);
       router.replace("/(tabs)/customer");

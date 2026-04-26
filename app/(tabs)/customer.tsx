@@ -61,9 +61,13 @@ export default function CustomerList() {
   }, []);
 
   const fetchData = async () => {
+    console.log("fetchData");
+
     try {
-      const result = await axiosInstance.get("api/nasabah");
+      const result = await axiosInstance.get("nasabah");
       setData(result.data.data);
+      console.log(result.data.data);
+
       router.replace("/(tabs)/customer");
     } catch (error) {
       console.log("DATA error:", error);
