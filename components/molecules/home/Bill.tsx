@@ -11,9 +11,9 @@ type Props = {
 
 type Item = {
   nama: string;
-  jatuhTempo: string;
+  jatuhTempoBerikutnya: string;
   noPinjaman: string;
-  cicilanKe: string;
+  angsuranKeTerakhir: string;
   status?: "Terlambat" | "Lunas" | "Terjadwal";
 };
 
@@ -56,7 +56,7 @@ export const Bill = ({ item, type, formatDate }: Props) => {
       {/* AVATAR */}
       <View style={[avatar, { backgroundColor: style.avatarBg }]}>
         <Texts color={style.avatarText} weight="bold">
-          {item.nama.slice(0, 2).toUpperCase()}
+          {item?.nama?.slice(0, 2).toUpperCase()}
         </Texts>
       </View>
 
@@ -66,13 +66,15 @@ export const Bill = ({ item, type, formatDate }: Props) => {
           {item.noPinjaman}
         </Texts>
         <Texts color="#6B7280">
-          {item.nama} • Angsuran ke - {item.cicilanKe}
+          {item?.nama} • Angsuran ke - {item.angsuranKeTerakhir}
         </Texts>
       </View>
 
       {/* DATE */}
       <View style={[dateBox, { backgroundColor: style.dateBg }]}>
-        <Texts color={style.dateText}>{formatDate(item.jatuhTempo)}</Texts>
+        <Texts color={style.dateText}>
+          {formatDate(item.jatuhTempoBerikutnya)}
+        </Texts>
       </View>
     </TouchableOpacity>
   );

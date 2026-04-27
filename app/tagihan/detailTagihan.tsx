@@ -1,7 +1,8 @@
 import { ActionButton, InfoCard } from "@/components/molecules";
-import { formatRupiah } from "@/utils";
+import { axiosInstance, formatDate, formatRupiah, isSameToday } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   StatusBar,
@@ -20,14 +21,8 @@ type TagihanParams = {
 export default function DetailTagihan() {
   const params = useLocalSearchParams<TagihanParams>();
 
-  const angsuran = [
-    { angsuran: 1, status: "Lunas", nominal: 200000 },
-    { angsuran: 2, status: "Terlambat", nominal: 200000 },
-    { angsuran: 3, status: "Terjadwal", nominal: 200000 },
-    { angsuran: 4, status: "Terjadwal", nominal: 200000 },
-    { angsuran: 5, status: "Terjadwal", nominal: 200000 },
-    { angsuran: 6, status: "Terjadwal", nominal: 200000 },
-  ];
+  const [data, setdata] = useState(params);
+  const [angsurans, setAngsurans] = useState([]);
 
   const getStatus = (status: string) => {
     if (status === "Lunas")
@@ -49,6 +44,19 @@ export default function DetailTagihan() {
       bg: "#FFF",
       icon: null,
     };
+  };
+
+  useEffect(() => {
+    loadInitial();
+  }, []);
+
+  const loadInitial = async () => {
+    try {
+      const result = await axiosInstance.get(`angsuran/${data?._id}`);
+      setAngsurans(result.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handlerPayment = (item: {
@@ -93,27 +101,36 @@ export default function DetailTagihan() {
 
           <View>
             <Text style={{ color: "#FFF", fontSize: 18, fontWeight: "700" }}>
-              {params.nama || "-"}
+              {data?.nama || "-"}
             </Text>
             <Text style={{ color: "#9CA3AF", fontSize: 13 }}>
-              No. Angota: {params.anggota || "200426001"}
+              No. Angota: {data?.anggota || ""}
             </Text>
             <Text style={{ color: "#9CA3AF", fontSize: 13 }}>
-              No. Pinjaman: {params.noPinjaman || "-"}
+              No. Pinjaman: {data?.noPinjaman || "-"}
             </Text>
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-            <InfoCard label="Pokok Pinjaman" value={formatRupiah(1000000)} />
+            <InfoCard
+              label="Pokok Pinjaman"
+              value={formatRupiah(data?.pinjamanPokok)}
+            />
             <InfoCard
               label="Angsuran/minggu"
-              value={formatRupiah(200000)}
+              value={formatRupiah(data?.angsuranNominal)}
               color="#60A5FA"
             />
-            <InfoCard label="Ansuran" value="6 minggu" />
+            <InfoCard
+              label="Ansuran"
+              value={data?.tenor + " " + data?.tipeAngsuran}
+            />
             <InfoCard
               label="Sisa Tagihan"
-              value={formatRupiah(1000000)}
+              value={formatRupiah(
+                (Number(data?.tenor) - Number(data?.angsuranKeTerakhir)) *
+                  Number(data?.angsuranNominal),
+              )}
               color="#EF4444"
             />
           </View>
@@ -129,20 +146,25 @@ export default function DetailTagihan() {
             <Text style={sectionTitle}>KARTU ANGSURAN</Text>
 
             <View style={cardContainer}>
-              {angsuran.map((item, index) => {
+              {angsurans.map((item, index) => {
                 const s = getStatus(item.status);
 
                 return (
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    disabled={item.status === "Lunas"}
+                    disabled={
+                      item.status === "lunas" || !isSameToday(item?.jatuhTempo)
+                    }
                     onPress={() => handlerPayment(item)}
                     key={index}
                     style={[
                       itemRow,
                       {
-                        backgroundColor:
-                          item.status === "Terlambat" ? s.bg : "#FFF",
+                        backgroundColor: isSameToday(item?.jatuhTempo)
+                          ? "#17ce5119"
+                          : item.status === "terlambat"
+                            ? s.bg
+                            : "#FFF",
                       },
                     ]}
                   >
@@ -150,23 +172,34 @@ export default function DetailTagihan() {
                     <View
                       style={[
                         indexCircle,
-                        { backgroundColor: s.bg || "#E5E7EB" },
+                        {
+                          backgroundColor: isSameToday(item?.jatuhTempo)
+                            ? "#17ce5133"
+                            : s.bg || "#E5E7EB",
+                        },
                       ]}
                     >
                       <Text style={{ fontWeight: "700", color: s.color }}>
-                        {index + 1}
+                        {item?.angsuranKe}
                       </Text>
                     </View>
 
                     {/* INFO */}
                     <View style={{ flex: 1, marginLeft: 12 }}>
-                      <Text style={{ fontWeight: "600", color: s.color }}>
-                        April 2026
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                          color: isSameToday(item?.jatuhTempo)
+                            ? "green"
+                            : s.color,
+                        }}
+                      >
+                        {formatDate(item?.jatuhTempo)}
                       </Text>
                       <Text style={{ fontSize: 12, color: "#9CA3AF" }}>
-                        {item.status === "Terlambat"
+                        {item.status === "terlambat"
                           ? "Belum bayar • +14 hari"
-                          : item.status === "Lunas"
+                          : item.status === "lunas"
                             ? "Lunas"
                             : "Jatuh tempo: 15 Mei 2026"}
                       </Text>
@@ -174,7 +207,14 @@ export default function DetailTagihan() {
 
                     {/* RIGHT */}
                     <View style={{ alignItems: "flex-end", gap: 4 }}>
-                      <Text style={{ fontWeight: "700", color: s.color }}>
+                      <Text
+                        style={{
+                          fontWeight: "700",
+                          color: isSameToday(item?.jatuhTempo)
+                            ? "green"
+                            : s.color,
+                        }}
+                      >
                         {formatRupiah(item.nominal)}
                       </Text>
 

@@ -4,8 +4,7 @@ const formatRupiah = (num: number) =>
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(num);
-
-const formatDate = (date: string | Date) => {
+const formatDateTime = (date: string | Date) => {
   const d = new Date(date);
   return (
     d.toLocaleDateString("id-ID", {
@@ -18,6 +17,14 @@ const formatDate = (date: string | Date) => {
       minute: "2-digit",
     })
   );
+};
+const formatDate = (date: string | Date) => {
+  const d = new Date(date);
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 };
 const getCurrentMonthYear = () => {
   return new Date().toLocaleDateString("id-ID", {
@@ -49,13 +56,23 @@ const parseRupiah = (value: string): number =>
 
 const formatDiscount = (pct: number): string => (pct > 0 ? `-${pct}%` : "-");
 
+const isSameToday = (date: string | Date) => {
+  const d1 = new Date(date);
+  const d2 = new Date();
+
+  return (
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear()
+  );
+};
+
 export {
   ANGSUR_TYPE,
   formatDate,
   formatDiscount,
   formatRupiah,
-  getCurrentMonthYear,
-  parseRupiah,
+  getCurrentMonthYear, isSameToday, parseRupiah,
   PAYMENT_METHODS,
   TENOR_TYPE
 };

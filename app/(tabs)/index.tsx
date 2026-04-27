@@ -21,17 +21,7 @@ type Item = {
   jatuhTempo: string;
   noPinjaman: string;
   cicilanKe: string;
-  status?: "Terlambat" | "Lunas" | "Terjadwal";
-};
-
-const generateDummy = (count: number): Item[] => {
-  return Array.from({ length: count }).map((_, i) => ({
-    nama: `Nasabah ${i + 1}`,
-    jatuhTempo: `2026-04-${(i % 28) + 1}`,
-    noPinjaman: String(1000 + i),
-    cicilanKe: String((i % 12) + 1),
-    status: i % 3 === 0 ? "Terlambat" : i % 3 === 1 ? "Terjadwal" : "Lunas",
-  }));
+  status?: "terlambat" | "lunas" | "aktif";
 };
 
 export default function HomeScreen() {
@@ -57,9 +47,7 @@ export default function HomeScreen() {
   const loadInitial = async () => {
     try {
       const result = await axiosInstance.get("pinjaman");
-      const initial = generateDummy(10);
-      console.log(result.data);
-      setData(initial);
+      setData(result.data);
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +58,6 @@ export default function HomeScreen() {
     setRefreshing(true);
 
     setTimeout(() => {
-      setData(generateDummy(10));
       setPage(1);
       setRefreshing(false);
     }, 1000);
@@ -81,37 +68,28 @@ export default function HomeScreen() {
     if (loadingMore) return;
 
     setLoadingMore(true);
-
-    setTimeout(() => {
-      const more = generateDummy(10).map((x, i) => ({
-        ...x,
-        noPinjaman: String(2000 + page * 10 + i),
-      }));
-
-      setData((prev) => [...prev, ...more]);
-      setPage((p) => p + 1);
-      setLoadingMore(false);
-    }, 1000);
   };
 
   // 🔥 FILTER BERDASARKAN TAB
   const filteredData = useMemo(() => {
+    console.log(data);
+
     if (tabSelected === "Terlambat") {
-      return data.filter((x) => x.status === "Terlambat");
+      return data.filter((x) => x.status === "terlambat");
     }
     if (tabSelected === "Lunas") {
-      return data.filter((x) => x.status === "Lunas");
+      return data.filter((x) => x.status === "lunas");
     }
     if (tabSelected === "Terjadwal") {
-      return data.filter((x) => x.status === "Terjadwal");
+      return data.filter((x) => x.status === "aktif");
     }
     return data;
   }, [tabSelected, data]);
 
   // 🔥 GROUPING
-  const lateData = filteredData.filter((x) => x.status === "Terlambat");
-  const scheduledData = filteredData.filter((x) => x.status === "Terjadwal");
-  const paidData = filteredData.filter((x) => x.status === "Lunas");
+  const lateData = filteredData.filter((x) => x.status === "terlambat");
+  const scheduledData = filteredData.filter((x) => x.status === "aktif");
+  const paidData = filteredData.filter((x) => x.status === "lunas");
 
   const toggleSession = (key: SessionKey) => {
     setSessions((prev) => ({ ...prev, [key]: !prev[key] }));
