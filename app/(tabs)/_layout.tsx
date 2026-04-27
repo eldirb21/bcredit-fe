@@ -18,13 +18,6 @@ export default function TabLayout() {
       title: "Nasabah",
       icon: (color: string) => <Icons size={24} name="users" color={color} />,
     },
-    // {
-    //   path: "history",
-    //   title: "Riwayat",
-    //   icon: (color: string) => (
-    //     <Icons size={24} name="activity" color={color} />
-    //   ),
-    // },
     {
       path: "settings",
       title: "Settings",

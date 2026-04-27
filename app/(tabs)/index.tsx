@@ -9,8 +9,8 @@ import {
   RefreshControl,
   ScrollView,
   StatusBar,
-  StyleSheet,
   View,
+  ViewStyle,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,10 +18,11 @@ type SessionKey = "late" | "scheduled" | "paid";
 
 type Item = {
   nama: string;
-  jatuhTempo: string;
+  jatuhTempoBerikutnya: string;
   noPinjaman: string;
   cicilanKe: string;
-  status?: "terlambat" | "lunas" | "aktif";
+  angsuranKeTerakhir: number;
+  status?: "lunas" | "terlambat" | "aktif";
 };
 
 export default function HomeScreen() {
@@ -105,11 +106,11 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#F5F6FA" />
 
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={container}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -129,7 +130,7 @@ export default function HomeScreen() {
           onSearch={() => router.push("/tagihan/searchTagihan")}
         />
 
-        <View style={styles.content}>
+        <View style={content}>
           {/* TABS */}
           <Tab
             tabs={tabs}
@@ -207,15 +208,13 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#F5F6FA",
-  },
-  container: {
-    paddingBottom: verticalScale(120),
-  },
-  content: {
-    padding: verticalScale(16),
-  },
-});
+const safe: ViewStyle = {
+  flex: 1,
+  backgroundColor: "#F5F6FA",
+};
+const container: ViewStyle = {
+  paddingBottom: verticalScale(120),
+};
+const content: ViewStyle = {
+  padding: verticalScale(16),
+};

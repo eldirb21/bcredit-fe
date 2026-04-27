@@ -13,8 +13,8 @@ type Item = {
   nama: string;
   jatuhTempoBerikutnya: string;
   noPinjaman: string;
-  angsuranKeTerakhir: string;
-  status?: "Terlambat" | "Lunas" | "Terjadwal";
+  angsuranKeTerakhir: number;
+  status?: "lunas" | "terlambat" | "aktif";
 };
 
 // 🔥 STYLE MAPPING
