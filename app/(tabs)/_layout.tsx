@@ -14,7 +14,7 @@ export default function TabLayout() {
       icon: (color: string) => <Icons size={24} name="home" color={color} />,
     },
     {
-      path: "customer",
+      path: "nasabah",
       title: "Nasabah",
       icon: (color: string) => <Icons size={24} name="users" color={color} />,
     },

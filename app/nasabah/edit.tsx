@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function AddCustomerScreen() {
+export default function EditNasabahScreen() {
   const [form, setForm] = useState({
     nama: "",
     pekerjaan: "",
@@ -35,8 +35,6 @@ export default function AddCustomerScreen() {
 
   const [errors, setErrors] = useState<any>({});
 
-  /* ================= HELPERS ================= */
-
   function generateNoPinjaman() {
     return "PJM-" + Date.now().toString().slice(-6);
   }
@@ -48,8 +46,6 @@ export default function AddCustomerScreen() {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev: any) => ({ ...prev, [key]: "" }));
   };
-
-  /* ================= CALCULATION ================= */
 
   useEffect(() => {
     calculateAngsuran();
@@ -80,13 +76,16 @@ export default function AddCustomerScreen() {
 
   const handleSubmit = async () => {
     try {
-      const result = await axiosInstance.post("nasabah", form);
+      const result = await axiosInstance.put("nasabah", form);
       console.log("DATA:", result.data?.success);
       console.log("DATA:", result.data?.message);
-      router.replace("/(tabs)/customer");
+      router.replace("/(tabs)/nasabah");
     } catch (error) {
       console.log("DATA error:", error);
     }
+    // TODO: kirim ke API / DB
+
+    router.back();
   };
 
   return (
@@ -103,7 +102,7 @@ export default function AddCustomerScreen() {
             <TouchableOpacity onPress={() => router.back()}>
               <Icons name="arrow-left" size={20} />
             </TouchableOpacity>
-            <Text style={styles.title}>Tambah Nasabah</Text>
+            <Text style={styles.title}>Edit Nasabah</Text>
             <View style={{ width: 20 }} />
           </View>
 
@@ -130,11 +129,6 @@ export default function AddCustomerScreen() {
               onChange={(v) => setField("jenisUsaha", v)}
             />
 
-            <Input
-              label="Resort"
-              value={form.resort}
-              onChange={(v) => setField("resort", v)}
-            />
             <Input
               label="No HP"
               value={form.phone}
@@ -207,7 +201,7 @@ export default function AddCustomerScreen() {
 
           {/* BUTTON */}
           <TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
-            <Text style={styles.submitText}>Simpan Nasabah</Text>
+            <Text style={styles.submitText}>Simpan Perubahan</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

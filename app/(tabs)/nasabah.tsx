@@ -15,15 +15,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type Customer = {
+type Nasabah = {
   _id: string;
   nama: string;
   phone: string;
   anggota: string;
 };
 
-export default function CustomerList() {
-  const [data, setData] = useState<Customer[]>([]);
+export default function NasabahrList() {
+  const [data, setData] = useState<Nasabah[]>([]);
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -68,7 +68,7 @@ export default function CustomerList() {
       setData(result.data.data);
       console.log(result.data.data);
 
-      router.replace("/(tabs)/customer");
+      router.replace("/(tabs)/nasabah");
     } catch (error) {
       console.log("DATA error:", error);
     }
@@ -83,7 +83,7 @@ export default function CustomerList() {
         <Text style={styles.title}>Data Nasabah</Text>
 
         <TouchableOpacity
-          onPress={() => router.push("/customers/add")}
+          onPress={() => router.push("/nasabah/add")}
           style={styles.addBtn}
         >
           <Icons name="plus" color="#FFF" size={16} />
@@ -107,18 +107,18 @@ export default function CustomerList() {
         keyExtractor={(item) => item?._id?.toString()}
         contentContainerStyle={{ padding: 16 }}
         renderItem={({ item, index }) => (
-          <CustomerItem
+          <NasabahItem
             key={String(item?._id + index)}
             onDetail={() =>
               router.push({
-                pathname: "/customers/detail",
+                pathname: "/nasabah/detail",
                 params: item,
               })
             }
             item={item}
             onEdit={() =>
               router.push({
-                pathname: "/customers/edit",
+                pathname: "/nasabah/edit",
                 params: { id: item._id },
               })
             }
@@ -127,7 +127,7 @@ export default function CustomerList() {
         )}
       />
       <Float
-        onFloat={() => router.push("/customers/ajukanPinjaman")}
+        onFloat={() => router.push("/nasabah/ajukanPinjaman")}
         title="Pinjaman Baru"
         icon="plus"
       />
@@ -136,13 +136,13 @@ export default function CustomerList() {
 }
 
 /* ITEM */
-const CustomerItem = ({
+const NasabahItem = ({
   item,
   onEdit,
   onDelete,
   onDetail,
 }: {
-  item: Customer;
+  item: Nasabah;
   onEdit: () => void;
   onDelete: () => void;
   onDetail: () => void;

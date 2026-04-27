@@ -22,13 +22,6 @@ export default function SettingScreen() {
 
   const [showEdit, setShowEdit] = useState(false);
 
-  // dummy stats (nanti ambil dari API / store)
-  const stats = {
-    customer: 120,
-    success: 80,
-    target: 86,
-  };
-
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.safe} contentContainerStyle={{ flexGrow: 1 }}>
@@ -61,7 +54,7 @@ export default function SettingScreen() {
 
         {/* STATS */}
         {/* <View style={styles.statsWrap}>
-          <StatBox label="Customer Aktif" value={stats.customer.toString()} />
+          <StatBox label="Nasabah Aktif" value={stats.nasabah.toString()} />
           <StatBox label="Berhasil" value={stats.success.toString()} success />
           <StatBox label="Target" value={`${stats.target}%`} info />
         </View> */}
@@ -71,7 +64,7 @@ export default function SettingScreen() {
           <MenuItem
             icon="users"
             label="Data Nasabah"
-            onPress={() => router.replace("/(tabs)/customer")}
+            onPress={() => router.replace("/(tabs)/nasabah")}
           />
           {/* <MenuItem
             icon="credit-card"

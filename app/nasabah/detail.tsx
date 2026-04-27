@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function CustomerDetail() {
+export default function NasabahDetail() {
   const params = useLocalSearchParams();
 
   const data = {
@@ -62,7 +62,7 @@ export default function CustomerDetail() {
           <TouchableOpacity
             onPress={() =>
               router.push({
-                pathname: "/customers/edit",
+                pathname: "/nasabah/edit",
                 params: { _id: Item?._id },
               })
             }
