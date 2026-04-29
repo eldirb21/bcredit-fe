@@ -64,7 +64,10 @@ export default function DetailTagihan() {
     status: string;
     angsuran: number;
   }) => {
-    router.push("/tagihan/payment");
+    router.push({
+      pathname: "/tagihan/payment",
+      params: item,
+    });
     console.log(item);
   };
 

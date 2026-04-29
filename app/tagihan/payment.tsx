@@ -1,12 +1,16 @@
 import { DateTimes, SelectInput } from "@/components/atoms";
 import { Input } from "@/components/atoms/Input";
 import { ActionButton } from "@/components/molecules";
-import { formatRupiah, PAYMENT_METHODS } from "@/utils";
+import {
+  axiosInstance,
+  formatDate,
+  formatRupiah,
+  PAYMENT_METHODS,
+} from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -23,13 +27,24 @@ const Payment = () => {
 
   // ✅ STATE FORM
   const [form, setForm] = useState({
-    amount: "",
-    date: null as Date | null,
-    time: null as Date | null,
+    nominal: "",
+    date: new Date(),
+    time: new Date(),
     method: "",
-    collector: "",
-    note: "",
+    pinjaman: "",
+    jumlahBayar: "1",
+    // collector: "",
+    // note: "",
   });
+
+  useEffect(() => {
+    setForm({
+      ...form,
+      nominal: String(params?.nominal),
+      jatuhTempo: Date(params?.jatuhTempo),
+      pinjaman: String(params?.pinjaman),
+    });
+  }, []);
 
   const [errors, setErrors] = useState<any>({});
   const [loading, setLoading] = useState(false);
@@ -44,11 +59,10 @@ const Payment = () => {
   const validate = () => {
     let newErrors: any = {};
 
-    if (!form.amount) newErrors.amount = "Jumlah wajib diisi";
-    if (!form.date) newErrors.date = "Tanggal wajib diisi";
-    if (!form.time) newErrors.time = "Jam wajib diisi";
-    if (!form.method) newErrors.method = "Metode wajib diisi";
-    if (!form.collector) newErrors.collector = "Nama kolektor wajib diisi";
+    if (!form.nominal) newErrors.nominal = "Jumlah wajib diisi";
+    // if (!form.date) newErrors.date = "Tanggal wajib diisi";
+    // if (!form.time) newErrors.time = "Jam wajib diisi";
+    if (!form.method) newErrors.method = "Metode pembayaran wajib diisi";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,23 +70,34 @@ const Payment = () => {
 
   // ✅ SUBMIT
   const handleSubmit = async () => {
-    // if (!validate()) return;
+    console.log(errors);
+
+    if (!validate()) return;
 
     try {
       setLoading(true);
 
       // simulasi API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log(form);
 
-      router.push("/tagihan/paymentSuccess");
+      const result = await axiosInstance.post(`angsuran/bayar-bulk`, {
+        pinjamanId: form.pinjaman,
+        jumlahBayar: String(form.jumlahBayar),
+      });
+
+      router.push({
+        pathname: "/tagihan/paymentSuccess",
+        params: form,
+      });
     } catch (error) {
-      Alert.alert("Error", "Terjadi kesalahan saat menyimpan");
+      console.log("handleSubmit: ", error);
+
+      // Alert.alert("Error", "Terjadi kesalahan saat menyimpan");
     } finally {
       setLoading(false);
     }
   };
-
-  // ✅ COMPONENT INPUT BIAR RAPI
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -118,19 +143,31 @@ const Payment = () => {
 
           {/* INFO */}
           <View style={styles.info}>
-            <Row label="Angsuran ke-" value="12" />
-            <Row label="Tagihan" value={formatRupiah(200000)} />
-            <Row label="Jatuh tempo" value="1 April 2026 (terlambat)" danger />
+            <Row label="Angsuran ke-" value={params.angsuranKe} />
+            <Row label="Tagihan" value={formatRupiah(form.nominal)} />
+            <Row
+              label="Jatuh tempo"
+              value={formatDate(form.jatuhTempo)}
+              danger
+            />
           </View>
 
           {/* FORM */}
           <Input
             label="JUMLAH DIBAYAR"
-            value={form.amount}
-            onChange={(v: string) => handleChange("amount", v)}
+            value={form.nominal}
+            onChange={(v: string) => handleChange("nominal", v)}
             placeholder="Rp"
             keyboardType="numeric"
-            error={errors.amount}
+            error={errors.nominal}
+          />
+
+          <Input
+            label="Jumlah Tenor X"
+            value={form.jumlahBayar}
+            onChange={(v: string) => handleChange("jumlahBayar", v)}
+            placeholder="Masukkan Total Tenor yang di bayar"
+            error={errors.jumlahBayar}
           />
 
           <View style={{ flexDirection: "row", gap: 8 }}>
@@ -164,20 +201,20 @@ const Payment = () => {
             error={errors.method}
           />
 
-          <Input
+          {/* <Input
             label="KOLEKTOR"
             value={form.collector}
             onChange={(v: string) => handleChange("collector", v)}
             placeholder="Ahmad"
             error={errors.collector}
-          />
+          /> */}
 
-          <Input
+          {/* <Input
             label="CATATAN (OPTIONAL)"
             value={form.note}
             onChange={(v: string) => handleChange("note", v)}
             placeholder="Tambahan info..."
-          />
+          /> */}
         </ScrollView>
 
         <View

@@ -1,10 +1,14 @@
+import { formatDate } from "@/utils";
 import { connectPrinter, initPrinter, printStruk } from "@/utils/printer";
+import { useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -113,8 +117,6 @@ const ThermalReceipt: React.FC<{ data: LoanData }> = ({ data }) => {
         <Text style={styles.metaValue}>: {data.noPjm}</Text>
         <Text style={styles.metaLabel}> No. Agt</Text>
         <Text style={styles.metaValue}>: {data.noAgt}</Text>
-        <Text style={styles.metaLabel}> Pjm Ke</Text>
-        <Text style={styles.metaValue}>: {data.pjmKe}</Text>
       </View>
 
       <View style={styles.dividerDash} />
@@ -129,16 +131,8 @@ const ThermalReceipt: React.FC<{ data: LoanData }> = ({ data }) => {
         <Text style={styles.fieldValue}>: {data.alamat}</Text>
       </View>
       <View style={styles.row}>
-        <Text style={styles.fieldLabel}>RT/RW</Text>
-        <Text style={styles.fieldValue}>
-          : {data.rt}/{data.rw}
-        </Text>
-        <Text style={[styles.fieldLabel, { marginLeft: 8 }]}>Ket</Text>
+        <Text style={styles.fieldLabel}>Pekerjaan</Text>
         <Text style={styles.fieldValue}>: {data.ket}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.fieldLabel}>Tanggal</Text>
-        <Text style={styles.fieldValue}>: {data.tanggal}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.fieldLabel}>Tempat Jualan</Text>
@@ -176,23 +170,15 @@ const ThermalReceipt: React.FC<{ data: LoanData }> = ({ data }) => {
       {/* Tanda terima pinjaman */}
       <Text style={styles.sectionTitle}>TANDA TERIMA PINJAMAN</Text>
       <View style={styles.row}>
-        <Text style={styles.fieldLabel}>Pokok</Text>
+        <Text style={styles.fieldLabel}>Tanggal</Text>
+        <Text style={styles.fieldValue}>: {data.tanggal}</Text>
+      </View>
+      <View style={styles.row}>
+        <Text style={styles.fieldLabel}>Pinjamana</Text>
         <Text style={styles.fieldValue}>: {rupiah(data.pokok)}</Text>
       </View>
       <View style={styles.row}>
-        <Text style={styles.fieldLabel}>Wajib</Text>
-        <Text style={styles.fieldValue}>: {rupiah(data.wajib)}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.fieldLabel}>Sukarela</Text>
-        <Text style={styles.fieldValue}>: {rupiah(data.sukarela)}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.fieldLabel}>Jumlah</Text>
-        <Text style={styles.fieldValue}>: {rupiah(data.jumlahMasuk)}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.fieldLabel}>Masuk</Text>
+        <Text style={styles.fieldLabel}>Di bayarkan</Text>
         <Text style={styles.fieldValue}>: {rupiah(data.masuk)}</Text>
       </View>
 
@@ -225,11 +211,6 @@ const ThermalReceipt: React.FC<{ data: LoanData }> = ({ data }) => {
 
       <View style={styles.dividerDash} />
       <Text style={styles.legend}>■ = Lunas ★ = Sekarang □ = Belum</Text>
-      <View style={styles.divider} />
-      <Text style={styles.footer}>
-        Terima kasih telah membayar tepat waktu.{"\n"}
-        Koperasi Indonesia — Bersama Kita Sejahtera
-      </Text>
     </View>
   );
 };
@@ -238,6 +219,9 @@ export default function PrintPreview() {
   const [devices, setDevices] = useState<any[]>([]);
   const [selected, setSelected] = useState<any>(null);
 
+  const params = useLocalSearchParams();
+  console.log("params", params);
+  // console.log("params", JSON.stringify(params?.anggota, null, 2));
   const handlePrint = async () => {
     if (!selected) {
       alert("Pilih printer dulu");
@@ -247,10 +231,10 @@ export default function PrintPreview() {
       await connectPrinter(selected.value);
 
       await printStruk({
-        nama: "Jojo",
-        anggotaId: "AG2026-001",
-        noPinjaman: "PJ001",
-        resort: "Jakarta Selatan",
+        nama: params?.nama,
+        anggotaId: params?.anggota,
+        noPinjaman: params?.noPinjaman,
+        resort: params?.noPinjaman,
 
         alamat:
           "Jl. Ki Hajar Dewantara No.19 Blok K, Gading, Kec. Serpong, Tangerang",
@@ -258,13 +242,13 @@ export default function PrintPreview() {
         jenisUsaha: "Warung Sembako dan Minuman Ringan",
         tempatUsaha: "Pasar Serpong",
 
-        tanggalBayar: "24-04-2026",
+        tanggalBayar: formatDate(params?.date),
 
-        pokok: 1000000,
-        angsuran: 200000,
-        cicilanKe: 2,
+        pokok: params?.pinjamanPokok,
+        angsuran: params?.angsuranNominal,
+        cicilanKe: params?.angsuranKeTerakhir,
 
-        status: "aktif",
+        status: params?.status,
       });
     } catch (err) {
       console.log("TouchableOpacity: ", err);
@@ -288,8 +272,8 @@ export default function PrintPreview() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.screenTitle}>Preview Struk Thermal</Text>
-      <Text style={styles.screenSub}>Lebar kertas: 58mm / 80mm</Text>
+      <StatusBar />
+      <Text style={styles.screenTitle}>Preview</Text>
 
       <ThermalReceipt data={sampleData} />
 
@@ -306,7 +290,7 @@ export default function PrintPreview() {
       />
 
       <TouchableOpacity style={styles.printBtn} onPress={handlePrint}>
-        <Text style={styles.printBtnText}>🖨️ Cetak ke Printer Thermal</Text>
+        <Text style={styles.printBtnText}>🖨️ Cetak</Text>
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />
@@ -318,13 +302,13 @@ export default function PrintPreview() {
 const FONT = Platform.OS === "ios" ? "Courier New" : "monospace";
 const W = 280; // lebar struk simulasi
 
-const input = {
-  backgroundColor: "#F3F4F6",
+const input: TextStyle = {
+  backgroundColor: "#e4efdf",
   padding: 12,
-  borderRadius: 10,
-  marginBottom: 10,
+  // borderRadius: 10,
+  marginTop: 10,
   textTransform: "capitalize",
-  width: 200,
+  width: "75%",
 };
 
 const styles = StyleSheet.create({
@@ -509,7 +493,7 @@ const styles = StyleSheet.create({
 
   // Print button
   printBtn: {
-    marginTop: 20,
+    marginTop: 16,
     backgroundColor: "#0077b6",
     paddingHorizontal: 28,
     paddingVertical: 14,
@@ -519,6 +503,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 6,
+    width: "75%",
+    alignItems: "center",
   },
   printBtnText: {
     color: "#fff",

@@ -1,8 +1,8 @@
 import { ActionButton } from "@/components/molecules";
-import { formatRupiah } from "@/utils";
+import { axiosInstance, formatDate, formatRupiah } from "@/utils";
 import Icons from "@expo/vector-icons/Feather";
-import { router } from "expo-router";
-import React from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   StatusBar,
@@ -14,6 +14,23 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const PaymentSuccess = () => {
+  const params = useLocalSearchParams();
+  const [data, setdata] = useState({});
+
+  useEffect(() => {
+    loadInitial();
+  }, []);
+
+  const loadInitial = async () => {
+    try {
+      const result = await axiosInstance.get(`pinjaman/${params?.pinjaman}`);
+      setdata(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(data);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F6FA" }}>
       <StatusBar barStyle="dark-content" backgroundColor="#e3e3e3" />
@@ -33,22 +50,23 @@ const PaymentSuccess = () => {
           <Text style={styles.successTitle}>Pembayaran Dicatat!</Text>
 
           <Text style={styles.successDesc}>
-            Angsuran ke-12 berhasil dicatat pada 15 Apr 2026
+            Angsuran ke-{params?.jumlahBayar} berhasil dicatat pada{" "}
+            {formatDate(String(params?.date))}
           </Text>
         </View>
 
         {/* RECEIPT */}
         <View style={styles.card}>
           <View style={styles.dashedBox}>
-            <Row label="No. Pinjaman" value="001" />
-            <Row label="Nama" value="Agus Santoso" />
-            <Row label="Angsuran ke-" value="12" />
-            <Row label="Tanggal" value="12 April 2026" />
-            <Row label="Metode" value="Cash" />
+            <Row label="No. Pinjaman" value={data?.noPinjaman} />
+            <Row label="Nama" value={data?.anggota?.nama} />
+            <Row label="Angsuran ke-" value={String(params?.jumlahBayar)} />
+            <Row label="Tanggal" value={formatDate(String(params?.date))} />
+            <Row label="Metode" value={String(params?.method)} />
             {/* <Row label="Kolektor" value="Ahmad" /> */}
           </View>
 
-          <Text style={styles.amount}>{formatRupiah(200000)}</Text>
+          <Text style={styles.amount}>{formatRupiah(params?.nominal)}</Text>
 
           <Text style={styles.note}>
             Terima kasih atas pembayaran Anda. Simpan struk ini sebagai bukti.
@@ -72,7 +90,12 @@ const PaymentSuccess = () => {
           icon="printer"
           label="Print"
           dark
-          onPress={() => router.push("/tagihan/printPreview")}
+          onPress={() =>
+            router.push({
+              pathname: "/tagihan/printPreview",
+              params: { ...data, ...data?.anggota, ...params },
+            })
+          }
         />
       </View>
 
