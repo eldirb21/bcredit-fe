@@ -1,8 +1,10 @@
 import { Icons } from "@/components/atoms";
 import { ActionButton } from "@/components/molecules";
+import { useAuth } from "@/hooks";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Modal,
   ScrollView,
   StatusBar,
@@ -15,12 +17,32 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingScreen() {
+  const { removeToken } = useAuth();
+
   const [user, setUser] = useState({
     name: "Eldiro",
     phone: "0813101817161",
   });
 
   const [showEdit, setShowEdit] = useState(false);
+
+
+  const handlerLogout = () => {
+
+    Alert.alert("Logout", "Yakin mau keluar?", [
+      { text: "Batal" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: handleLogout,
+      },
+    ]);
+  };
+
+  const handleLogout = async () => {
+    await removeToken();
+    router.replace('/auth/login');
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -91,7 +113,7 @@ export default function SettingScreen() {
               dark
               label="Logout"
               icon={"log-out"}
-              onPress={() => {}}
+              onPress={handlerLogout}
             />
           </View>
         </View>

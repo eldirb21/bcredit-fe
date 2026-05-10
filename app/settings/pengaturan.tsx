@@ -1,14 +1,14 @@
 import Icons from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,7 +17,9 @@ export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const [autoSync, setAutoSync] = useState(true);
 
-  const handleLogout = () => {
+  const handlerLogout = () => {
+    console.log('pewrer');
+    
     Alert.alert("Logout", "Yakin mau keluar?", [
       { text: "Batal" },
       {
@@ -79,7 +81,7 @@ export default function SettingsScreen() {
             icon="log-out"
             label="Logout"
             danger
-            onPress={handleLogout}
+            onPress={handlerLogout}
           />
         </Section>
       </ScrollView>
