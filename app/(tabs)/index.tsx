@@ -1,98 +1,220 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+'use client'
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Float, Texts } from '@/components/atoms'
+import { Bill, Header, Section, Tab } from '@/components/molecules/home'
+import { axiosInstance, verticalScale } from '@/utils'
+import { router } from 'expo-router'
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  View,
+  ViewStyle,
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+type SessionKey = 'late' | 'scheduled' | 'paid'
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+type Item = {
+  nama: string
+  jatuhTempoBerikutnya: string
+  noPinjaman: string
+  cicilanKe: string
+  angsuranKeTerakhir: number
+  status?: 'lunas' | 'terlambat' | 'aktif'
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+export default function HomeScreen() {
+  const [tabSelected, setTabSelected] = useState('Semua')
+  const [sessions, setSessions] = useState({
+    late: true,
+    scheduled: true,
+    paid: true,
+  })
+
+  const [data, setData] = useState<Item[]>([])
+  const [page, setPage] = useState(1)
+  const [refreshing, setRefreshing] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  const tabs = ['Semua', 'Terlambat', 'Lunas', 'Terjadwal']
+
+  // 🔥 INIT DATA
+  useEffect(() => {
+    loadInitial()
+  }, [])
+
+  const loadInitial = async () => {
+    try {
+      const result = await axiosInstance.get('pinjaman')
+      setData(result.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // 🔄 REFRESH
+  const onRefresh = async () => {
+    setRefreshing(true)
+
+    setTimeout(() => {
+      setPage(1)
+      setRefreshing(false)
+    }, 1000)
+  }
+
+  // ⬇️ LOAD MORE
+  const loadMore = () => {
+    if (loadingMore) return
+
+    setLoadingMore(true)
+  }
+
+  // 🔥 FILTER BERDASARKAN TAB
+  const filteredData = useMemo(() => {
+    console.log(data)
+
+    if (tabSelected === 'Terlambat') {
+      return data.filter((x) => x.status === 'terlambat')
+    }
+    if (tabSelected === 'Lunas') {
+      return data.filter((x) => x.status === 'lunas')
+    }
+    if (tabSelected === 'Terjadwal') {
+      return data.filter((x) => x.status === 'aktif')
+    }
+    return data
+  }, [tabSelected, data])
+
+  // 🔥 GROUPING
+  const lateData = filteredData.filter((x) => x.status === 'terlambat')
+  const scheduledData = filteredData.filter((x) => x.status === 'aktif')
+  const paidData = filteredData.filter((x) => x.status === 'lunas')
+
+  const toggleSession = (key: SessionKey) => {
+    setSessions((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const formatDate = (date: string) => {
+    const d = new Date(date)
+    return d.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+  }
+
+  return (
+    <SafeAreaView style={safe}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F6FA" />
+
+      <ScrollView
+        contentContainerStyle={container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
+
+          const isEnd =
+            layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - 20
+
+          if (isEnd) loadMore()
+        }}
+        scrollEventThrottle={16}
+      >
+        <Header
+          lateData={lateData.length}
+          onSearch={() => router.push('/tagihan/searchTagihan')}
+        />
+
+        <View style={content}>
+          {/* TABS */}
+          <Tab
+            tabs={tabs}
+            tabSelected={tabSelected}
+            setTabSelected={setTabSelected}
+          />
+
+          {/* TERLAMBAT */}
+          {lateData.length > 0 && (
+            <Section
+              title="PRIORITAS TERLAMBAT"
+              open={sessions.late}
+              onToggle={() => toggleSession('late')}
+            >
+              {lateData.map((item, i) => (
+                <Bill
+                  key={`${item.noPinjaman}-${i}`}
+                  item={item}
+                  type="late"
+                  formatDate={formatDate}
+                />
+              ))}
+            </Section>
+          )}
+
+          {/* LUNAS */}
+          {paidData.length > 0 && (
+            <Section
+              title="LUNAS"
+              open={sessions.paid}
+              onToggle={() => toggleSession('paid')}
+            >
+              {paidData.map((item, i) => (
+                <Bill
+                  key={`${item.noPinjaman}-${i}`}
+                  item={item}
+                  type="paid"
+                  formatDate={formatDate}
+                />
+              ))}
+            </Section>
+          )}
+
+          {/* TERJADWAL */}
+          {scheduledData.length > 0 && (
+            <Section
+              title="TERJADWAL"
+              open={sessions.scheduled}
+              onToggle={() => toggleSession('scheduled')}
+            >
+              {scheduledData.map((item, i) => (
+                <Bill
+                  key={`${item.noPinjaman}-${i}`}
+                  item={item}
+                  type="scheduled"
+                  formatDate={formatDate}
+                />
+              ))}
+            </Section>
+          )}
+        </View>
+        {loadingMore && (
+          <View style={{ padding: 16 }}>
+            <Texts>Loading more...</Texts>
+          </View>
+        )}
+      </ScrollView>
+
+      <Float
+        onFloat={() => router.push('/tagihan/addTagihan')}
+        title="Catat Pembayaran"
+        icon="plus"
+      />
+    </SafeAreaView>
+  )
+}
+
+const safe: ViewStyle = {
+  flex: 1,
+  backgroundColor: '#F5F6FA',
+}
+const container: ViewStyle = {
+  paddingBottom: verticalScale(120),
+}
+const content: ViewStyle = {
+  padding: verticalScale(16),
+}
