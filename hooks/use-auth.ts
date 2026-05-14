@@ -1,26 +1,51 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import { useCallback, useEffect, useState } from 'react'
+
+const TOKEN_KEY = 'ACCESS_TOKEN'
 
 export function useAuth() {
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null)
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  // CHECK TOKEN
+  const checkAuth = useCallback(async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem(TOKEN_KEY)
+
+      setToken(storedToken)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  // SAVE TOKEN
+  const saveToken = async (newToken: string) => {
+    await AsyncStorage.setItem(TOKEN_KEY, newToken)
+
+    setToken(newToken)
+  }
+
+  // REMOVE TOKEN
+  const removeToken = async () => {
+    await AsyncStorage.removeItem(TOKEN_KEY)
+
+    setToken(null)
+  }
 
   useEffect(() => {
-    AsyncStorage.getItem('token').then((value) => {
-      setToken(value);
-      setIsLoading(false);
-    });
-  }, []);
+    checkAuth()
+  }, [checkAuth])
 
-  const saveToken = async (newToken: string) => {
-    await AsyncStorage.setItem('token', newToken);
-    setToken(newToken);
-  };
+  return {
+    token,
+    isLoading,
 
-  const removeToken = async () => {
-    await AsyncStorage.removeItem('token');
-    setToken(null);
-  };
+    saveToken,
+    removeToken,
+    checkAuth,
 
-  return { token, isLoading, saveToken, removeToken };
+    isAuthenticated: !!token,
+  }
 }

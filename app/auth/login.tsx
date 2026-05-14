@@ -1,5 +1,6 @@
 import { useLoginAnimation } from '@/hooks'
-import { useAuth } from '@/hooks/use-auth'
+import { loginThunk } from '@/store/auth/auth.thunk'
+import { useAppDispatch } from '@/store/hooks'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import {
@@ -18,7 +19,7 @@ const { width } = Dimensions.get('window')
 
 export default function LoginScreen() {
   const router = useRouter()
-  const { saveToken } = useAuth()
+  const dispatch = useAppDispatch()
 
   const {
     bgStyle,
@@ -39,13 +40,11 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     animateButtonPress()
 
-    setIsLoading(true)
+    const result = await dispatch(loginThunk({ email, password }))
 
-    setTimeout(async () => {
-      await saveToken('token-dari-api')
+    if (loginThunk.fulfilled.match(result)) {
       router.replace('/(tabs)')
-      setIsLoading(false)
-    }, 1200)
+    }
   }
 
   return (
